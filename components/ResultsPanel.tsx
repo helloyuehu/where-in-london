@@ -18,13 +18,6 @@ function money(value: number | null) {
   return value === null ? "No data" : `£${value.toLocaleString("en-GB")}`;
 }
 
-function crimeComparison(total: number, average: number) {
-  if (!average) return "No London comparison";
-  const delta = Math.round(((total - average) / average) * 100);
-  if (Math.abs(delta) < 2) return "about London average";
-  return `${Math.abs(delta)}% ${delta < 0 ? "below" : "above"} London average`;
-}
-
 function resultState(result: MatchResult) {
   if (result.allMatch) return "match";
   if (result.failedCriteria.length === 1) return "near";
@@ -41,9 +34,6 @@ export function ResultsPanel({ filters, results, selectedId, onSelect }: Props) 
   const matches = results.filter((result) => result.allMatch);
   const nearMatches = results.filter((result) => !result.allMatch && result.failedCriteria.length === 1);
   const nonMatches = results.filter((result) => result.failedCriteria.length >= 2);
-  const londonCrimeAverage = results.length
-    ? Math.round(results.reduce((sum, result) => sum + result.area.crime.total, 0) / results.length)
-    : 0;
 
   return (
     <aside className="resultsPanel">
@@ -51,7 +41,7 @@ export function ResultsPanel({ filters, results, selectedId, onSelect }: Props) 
         <div>
           <p className="eyebrow">London rental fit</p>
           <h1>{matches.length} match</h1>
-          <p className="coverageCopy">{results.length} demo areas evaluated · all London wards shown on map</p>
+          <p className="coverageCopy">{results.length} areas evaluated · all London wards shown on map</p>
         </div>
         <span className="demoBadge">V1 · fixture metrics</span>
       </div>
@@ -62,7 +52,6 @@ export function ResultsPanel({ filters, results, selectedId, onSelect }: Props) 
         <span>£{filters.rentMin.toLocaleString("en-GB")}–£{filters.rentMax.toLocaleString("en-GB")}</span>
         <span>{String(filters.bedroom) === "studio" ? "Studio" : `${filters.bedroom} bed`}</span>
         <span>≤ {filters.maxCrime === 9999 ? "Any" : filters.maxCrime} crimes / month</span>
-        <span>London demo avg: {londonCrimeAverage} / month</span>
       </div>
 
       <div className="resultsList">
@@ -72,7 +61,6 @@ export function ResultsPanel({ filters, results, selectedId, onSelect }: Props) 
           results={matches}
           selectedId={selectedId}
           onSelect={onSelect}
-          londonCrimeAverage={londonCrimeAverage}
         />
 
         {matches.length === 0 && (
@@ -88,7 +76,6 @@ export function ResultsPanel({ filters, results, selectedId, onSelect }: Props) 
           results={nearMatches}
           selectedId={selectedId}
           onSelect={onSelect}
-          londonCrimeAverage={londonCrimeAverage}
           compact
         />
 
@@ -98,7 +85,6 @@ export function ResultsPanel({ filters, results, selectedId, onSelect }: Props) 
           results={nonMatches}
           selectedId={selectedId}
           onSelect={onSelect}
-          londonCrimeAverage={londonCrimeAverage}
           compact
         />
       </div>
@@ -112,7 +98,6 @@ function ResultSection({
   results,
   selectedId,
   onSelect,
-  londonCrimeAverage,
   compact = false,
 }: {
   title: string;
@@ -120,7 +105,6 @@ function ResultSection({
   results: MatchResult[];
   selectedId: string | null;
   onSelect: (id: string) => void;
-  londonCrimeAverage: number;
   compact?: boolean;
 }) {
   if (!results.length) return null;
@@ -138,7 +122,6 @@ function ResultSection({
           selected={selectedId === result.area.id}
           onSelect={() => onSelect(result.area.id)}
           compact={compact}
-          londonCrimeAverage={londonCrimeAverage}
         />
       ))}
     </section>
@@ -149,13 +132,11 @@ function AreaCard({
   result,
   selected,
   onSelect,
-  londonCrimeAverage,
   compact = false,
 }: {
   result: MatchResult;
   selected: boolean;
   onSelect: () => void;
-  londonCrimeAverage: number;
   compact?: boolean;
 }) {
   const { area } = result;
@@ -189,17 +170,9 @@ function AreaCard({
         <div className={`metric ${result.crimeMatches ? "pass" : "fail"}`}>
           <span>{result.crimeMatches ? "✓" : "✕"} Reported crime</span>
           <strong>{area.crime.total}</strong>
-          <small>{crimeComparison(area.crime.total, londonCrimeAverage)}</small>
+          <small>{area.crime.month} · within {area.crime.radiusMiles} mile</small>
         </div>
       </div>
-
-      {!compact && (
-        <div className="crimeContext">
-          <span>London demo average</span>
-          <strong>{londonCrimeAverage} reported crimes / month</strong>
-          <small>Same fixture measurement basis as the area cards. This will be replaced by real Police.uk data.</small>
-        </div>
-      )}
 
       {!compact && route && <div className="routeLine"><span className="routeIcon">↳</span><span>{route}</span></div>}
 
