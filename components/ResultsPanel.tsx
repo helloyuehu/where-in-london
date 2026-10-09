@@ -41,8 +41,6 @@ export function ResultsPanel({
   onSelect,
   isLoading,
   factsReadyCount,
-  candidateCount,
-  commuteCheckedCount,
   generatedAt,
 }: Props) {
   const matches = results.filter((result) => result.state === "match");
@@ -64,19 +62,12 @@ export function ResultsPanel({
         <div>
           <p className="eyebrow">London rental fit</p>
           <h1>{heading}</h1>
-          <p className="coverageCopy">
-            {results.length > 0
-              ? `${results.length} representative areas · ${factsReadyCount} have rent + crime · ${candidateCount} pass rent + crime · ${commuteCheckedCount} commute estimates ready`
-              : "Loading representative London areas…"}
-          </p>
-          <p className="coverageCopy">Commute is an instant distance-based estimate for this prototype, so results never wait on TfL.</p>
         </div>
-        <span className="demoBadge live">Usable prototype</span>
       </div>
 
       <div className="summaryChips" aria-label="Active filters">
         <span>≤ {filters.maxCommuteMinutes} min to {filters.destinationPostcode || "work"}</span>
-        <span>{filters.travelModes.includes("publicTransport") ? "Transit estimate" : ""}{filters.travelModes.length === 2 ? " + " : ""}{filters.travelModes.includes("walking") ? "Walk estimate" : ""}</span>
+        <span>{filters.travelModes.includes("publicTransport") ? "Transit" : ""}{filters.travelModes.length === 2 ? " + " : ""}{filters.travelModes.includes("walking") ? "Walk" : ""}</span>
         <span>£{filters.rentMin.toLocaleString("en-GB")}–£{filters.rentMax.toLocaleString("en-GB")}</span>
         <span>{String(filters.bedroom) === "studio" ? "Studio" : `${filters.bedroom} bed`}</span>
         <span>≤ {filters.maxCrime === 9999 ? "Any" : filters.maxCrime} crimes / month</span>
@@ -247,14 +238,7 @@ function AreaCard({
 
       {!compact && area.profile.tags.length > 0 && (
         <div className="tagRow">
-          {area.profile.tags.map((tag) => <span key={tag}>{tag}</span>)}
-        </div>
-      )}
-
-      {!compact && area.sources.length > 0 && (
-        <div className="sourceLine" aria-label="Data sources">
-          <span>Sources</span>
-          <span>{Array.from(new Set(area.sources.map((source) => source.detail))).join(" · ")}</span>
+          {area.profile.tags.map((tag) => <span key={tag}>{tag}</span>}
         </div>
       )}
     </button>
