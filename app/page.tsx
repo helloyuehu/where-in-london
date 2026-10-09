@@ -157,9 +157,9 @@ export default function Home() {
     <main className="appFrame">
       <header className="topBar">
         <div className="brandBlock">
-          <div className="brandMark">L</div>
+          <div className="brandMark">W</div>
           <div>
-            <strong>London Rental Fit</strong>
+            <strong>Where in London?</strong>
             <span>Constraint-based area explorer</span>
           </div>
         </div>
