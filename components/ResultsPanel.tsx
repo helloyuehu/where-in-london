@@ -97,7 +97,6 @@ export function ResultsPanel({
 
         <ResultSection
           title="Matches"
-          detail="Meets every active constraint"
           results={matches}
           selectedId={selectedId}
           onSelect={onSelect}
@@ -150,7 +149,7 @@ function ResultSection({
   compact = false,
 }: {
   title: string;
-  detail: string;
+  detail?: string;
   results: MatchResult[];
   selectedId: string | null;
   onSelect: (id: string) => void;
@@ -162,7 +161,7 @@ function ResultSection({
     <section className="resultSection">
       <div className="sectionHeading">
         <span>{title} <b>{results.length}</b></span>
-        <small>{detail}</small>
+        {detail && <small>{detail}</small>}
       </div>
       {results.map((result) => (
         <AreaCard
@@ -215,6 +214,7 @@ function AreaCard({
   const walking = area.commute.walking;
   const crime = area.crime;
   const boundary = area.boundaryName && area.boundaryName !== area.name ? ` · ${area.boundaryName} ward` : "";
+  const visibleTags = area.profile.tags.filter((tag) => tag.trim().toLowerCase() !== "private renting");
 
   return (
     <button
@@ -254,9 +254,9 @@ function AreaCard({
         />
       </div>
 
-      {!compact && area.profile.tags.length > 0 && (
+      {!compact && visibleTags.length > 0 && (
         <div className="tagRow">
-          {area.profile.tags.map((tag) => <span key={tag}>{tag}</span>)}
+          {visibleTags.map((tag) => <span key={tag}>{tag}</span>)}
         </div>
       )}
     </button>
