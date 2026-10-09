@@ -25,7 +25,7 @@ export function FilterBar({ filters, onChange, londonCrimeAverage }: Props) {
       className="filterBar"
       aria-label="Search filters"
       style={{
-        gridTemplateColumns: "minmax(108px,.75fr) 82px 126px 122px minmax(160px,1fr) 88px minmax(190px,1.08fr)",
+        gridTemplateColumns: "minmax(102px,.7fr) 96px 120px 122px minmax(150px,.95fr) 84px minmax(185px,1.05fr)",
         gap: 8,
         overflowX: "auto",
       }}
@@ -39,7 +39,7 @@ export function FilterBar({ filters, onChange, londonCrimeAverage }: Props) {
       </div>
 
       <div className="filterGroup compact">
-        <label htmlFor="commute">Max commute</label>
+        <label htmlFor="commute" style={{ whiteSpace: "nowrap" }}>Max commute</label>
         <div className="numberSuffix">
           <input id="commute" type="number" min={5} max={180} value={filters.maxCommuteMinutes} onChange={(event) => update("maxCommuteMinutes", Number(event.target.value) || 5)} />
           <span>min</span>
@@ -67,7 +67,7 @@ export function FilterBar({ filters, onChange, londonCrimeAverage }: Props) {
 
       <div className="filterGroup rentGroup">
         <span className="fieldLabel">Monthly rent</span>
-        <div className="rentInputs" style={{ gridTemplateColumns: "minmax(60px,1fr) auto minmax(60px,1fr)" }}>
+        <div className="rentInputs" style={{ gridTemplateColumns: "minmax(56px,1fr) auto minmax(56px,1fr)" }}>
           <div className="numberPrefix"><span>£</span><input aria-label="Minimum rent" type="number" step={50} value={filters.rentMin} onChange={(event) => update("rentMin", Number(event.target.value) || 0)} /></div>
           <span className="rangeDash">to</span>
           <div className="numberPrefix"><span>£</span><input aria-label="Maximum rent" type="number" step={50} value={filters.rentMax} onChange={(event) => update("rentMax", Number(event.target.value) || 0)} /></div>
@@ -94,7 +94,7 @@ export function FilterBar({ filters, onChange, londonCrimeAverage }: Props) {
           margin: "-7px 0 -8px",
         }}
       >
-        <label htmlFor="crime" style={{ color: "#165a9d", marginBottom: 4 }}>Reported crime / month</label>
+        <label htmlFor="crime" style={{ color: "#165a9d", marginBottom: 4, whiteSpace: "nowrap" }}>Reported crime / month</label>
         <span className="filterSubheader" style={{ color: "#3976ad", marginBottom: 4 }}>
           {londonCrimeAverage === null
             ? "London area average · loading"
