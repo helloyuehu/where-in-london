@@ -4,8 +4,8 @@ import "./globals.css";
 import "./map-overrides.css";
 
 export const metadata: Metadata = {
-  title: "London Rental Fit",
-  description: "Explore which parts of Greater London fit your commute, rent and reported-crime constraints.",
+  title: "Where in London?",
+  description: "Find areas that fit your priorities.",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
