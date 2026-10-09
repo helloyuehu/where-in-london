@@ -1,5 +1,7 @@
 export type TravelMode = "publicTransport" | "walking";
 export type BedroomOption = "studio" | 1 | 2 | 3 | "4+";
+export type Criterion = "commute" | "rent" | "crime";
+export type ResultState = "match" | "near" | "fail" | "pending";
 
 export type RouteLeg = {
   mode: "walk" | "tube" | "bus" | "rail" | "dlr" | "overground" | "tram";
@@ -20,6 +22,7 @@ export type SourceRef = {
 
 export type LondonArea = {
   id: string;
+  wardCode: string;
   name: string;
   borough: string;
   referencePoint: {
@@ -28,20 +31,21 @@ export type LondonArea = {
     lng: number;
   };
   commute: {
-    publicTransport: CommuteOption;
-    walking: CommuteOption;
+    publicTransport: CommuteOption | null;
+    walking: CommuteOption | null;
   };
   crime: {
     month: string;
     total: number;
     radiusMiles: number;
-  };
-  rentByBedroom: Record<string, number>;
+  } | null;
+  rentByBedroom: Record<string, number> | null;
   profile: {
     summary: string;
     tags: string[];
   };
   sources: SourceRef[];
+  dataStatus?: "ready" | "partial" | "pending";
 };
 
 export type FilterState = {
@@ -58,9 +62,11 @@ export type FilterState = {
 export type MatchResult = {
   area: LondonArea;
   rent: number | null;
-  commuteMatches: boolean;
-  rentMatches: boolean;
-  crimeMatches: boolean;
+  commuteMatches: boolean | null;
+  rentMatches: boolean | null;
+  crimeMatches: boolean | null;
   allMatch: boolean;
-  failedCriteria: Array<"commute" | "rent" | "crime">;
+  state: ResultState;
+  failedCriteria: Criterion[];
+  missingCriteria: Criterion[];
 };
