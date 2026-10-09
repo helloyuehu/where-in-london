@@ -1,16 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
 
-export const revalidate = 2592000;
+export const dynamic = "force-dynamic";
 
 export async function GET(request: NextRequest) {
-  const postcode = request.nextUrl.searchParams.get("postcode")?.trim();
-  if (!postcode) {
+  const rawPostcode = request.nextUrl.searchParams.get("postcode")?.trim();
+  if (!rawPostcode) {
     return NextResponse.json({ error: "Postcode is required." }, { status: 400 });
   }
 
+  const postcode = rawPostcode.replace(/\s+/g, "").toUpperCase();
+
   try {
     const response = await fetch(`https://api.postcodes.io/postcodes/${encodeURIComponent(postcode)}`, {
-      next: { revalidate },
+      cache: "no-store",
+      signal: AbortSignal.timeout(5000),
     });
 
     if (!response.ok) {
@@ -18,7 +21,7 @@ export async function GET(request: NextRequest) {
     }
 
     const data = await response.json();
-    if (!data?.result?.latitude || !data?.result?.longitude) {
+    if (!Number.isFinite(data?.result?.latitude) || !Number.isFinite(data?.result?.longitude)) {
       return NextResponse.json({ error: "Postcode coordinates unavailable." }, { status: 404 });
     }
 
