@@ -58,11 +58,11 @@ export function ResultsPanel({
           <h1>{isLoading ? "Loading London…" : `${matches.length} match`}</h1>
           <p className="coverageCopy">
             {results.length > 0
-              ? `${results.length} official wards · ${readyCount} fully evaluated${pending.length ? ` · ${pending.length} awaiting data` : ""}`
-              : "Loading official GLA ward geography and metrics…"}
+              ? `${results.length} London areas · ${readyCount} fully evaluated${pending.length ? ` · ${pending.length} awaiting data` : ""}`
+              : "Loading official London area boundaries and metrics…"}
           </p>
         </div>
-        <span className="demoBadge live">Official wards</span>
+        <span className="demoBadge live">Official boundaries</span>
       </div>
 
       <div className="summaryChips" aria-label="Active filters">
@@ -110,7 +110,7 @@ export function ResultsPanel({
 
         <ResultSection
           title="Data pending"
-          detail="Official ward is shown; one or more metrics are still unavailable"
+          detail="Area boundary is available; one or more metrics are still loading"
           results={pending}
           selectedId={selectedId}
           onSelect={onSelect}
@@ -201,7 +201,7 @@ function AreaCard({
       <div className="cardTopline">
         <div>
           <h2>{area.name}</h2>
-          <p>{area.borough} · Ward</p>
+          <p>{area.borough}</p>
         </div>
         <span className={`matchPill ${result.state}`}>{statusLabel(result)}</span>
       </div>
