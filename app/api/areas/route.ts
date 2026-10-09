@@ -31,6 +31,17 @@ type GeneratedPayload = {
   wards?: GeneratedWard[];
 };
 
+type CensusProfile = {
+  summary: string;
+  tags?: string[];
+  source?: string;
+};
+
+type CensusProfilePayload = {
+  generatedAt?: string | null;
+  profiles?: Record<string, CensusProfile>;
+};
+
 function outerRings(geometry: Geometry): Position[][] {
   if (geometry.type === "Polygon") return [(geometry as Polygon).coordinates[0]];
   if (geometry.type === "MultiPolygon") return (geometry as MultiPolygon).coordinates.map((polygon) => polygon[0]);
@@ -70,30 +81,37 @@ function referencePoint(geometry: Geometry) {
   return ringCentroid(ring);
 }
 
-async function readGenerated(): Promise<GeneratedPayload> {
+async function readJson<T>(filePath: string, fallback: T): Promise<T> {
   try {
-    const filePath = path.join(process.cwd(), "lib", "data", "ward-metrics.generated.json");
-    return JSON.parse(await readFile(filePath, "utf8")) as GeneratedPayload;
+    return JSON.parse(await readFile(path.join(process.cwd(), filePath), "utf8")) as T;
   } catch {
-    return { wards: [] };
+    return fallback;
   }
 }
 
-function sourceList(ward: GeneratedWard | undefined) {
-  if (!ward?.sources) return [{ label: "geography", detail: "Greater London Authority · London Wards (2022)" }];
-  return [
+function sourceList(ward: GeneratedWard | undefined, censusProfile: CensusProfile | undefined) {
+  const sources = [
     { label: "geography", detail: "Greater London Authority · London Wards (2022)" },
-    ...Object.entries(ward.sources)
-      .filter(([, detail]) => Boolean(detail))
-      .map(([label, detail]) => ({ label, detail: String(detail) })),
   ];
+  if (ward?.sources) {
+    sources.push(
+      ...Object.entries(ward.sources)
+        .filter(([, detail]) => Boolean(detail))
+        .map(([label, detail]) => ({ label, detail: String(detail) })),
+    );
+  }
+  if (censusProfile?.source) {
+    sources.push({ label: "profile", detail: censusProfile.source });
+  }
+  return sources.filter((source, index, all) => all.findIndex((candidate) => candidate.detail === source.detail) === index);
 }
 
 export async function GET() {
   try {
-    const [wardsResponse, generated] = await Promise.all([
+    const [wardsResponse, generated, censusProfiles] = await Promise.all([
       fetch(GLA_WARDS, { next: { revalidate } }),
-      readGenerated(),
+      readJson<GeneratedPayload>("lib/data/ward-metrics.generated.json", { wards: [] }),
+      readJson<CensusProfilePayload>("data/ward-profiles.generated.json", { profiles: {} }),
     ]);
     if (!wardsResponse.ok) throw new Error("Official GLA ward request failed");
 
@@ -111,18 +129,21 @@ export async function GET() {
       const borough = String(properties.la_name || "London");
       const point = referencePoint(feature.geometry);
       const metrics = generatedByCode.get(wardCode);
+      const censusProfile = censusProfiles.profiles?.[wardCode];
       const commute = {
         publicTransport: metrics?.commute?.publicTransport ?? null,
         walking: metrics?.commute?.walking ?? null,
       };
       const crime = metrics?.crime ?? null;
       const rentByBedroom = metrics?.rentByBedroom ?? null;
-      const profile = metrics?.profile?.summary
-        ? { summary: metrics.profile.summary, tags: metrics.profile.tags || [] }
-        : {
-            summary: `${name} is an official electoral ward in ${borough}. Detailed demographic context is still being populated from official London data.`,
-            tags: [borough],
-          };
+      const profile = censusProfile?.summary
+        ? { summary: censusProfile.summary, tags: censusProfile.tags || [] }
+        : metrics?.profile?.summary
+          ? { summary: metrics.profile.summary, tags: metrics.profile.tags || [] }
+          : {
+              summary: `${name} is an official electoral ward in ${borough}. Detailed demographic context is still being populated from official London data.`,
+              tags: [borough],
+            };
       const hardMetricsReady = Boolean(commute.publicTransport && commute.walking && crime && rentByBedroom);
       const anyMetrics = Boolean(commute.publicTransport || commute.walking || crime || rentByBedroom);
 
@@ -136,7 +157,7 @@ export async function GET() {
         crime,
         rentByBedroom,
         profile,
-        sources: sourceList(metrics),
+        sources: sourceList(metrics, censusProfile),
         dataStatus: hardMetricsReady ? "ready" : anyMetrics ? "partial" : "pending",
       };
     });
@@ -145,7 +166,9 @@ export async function GET() {
       areas,
       wardCount: areas.length,
       readyCount: areas.filter((area) => area.dataStatus === "ready").length,
+      profileCount: areas.filter((area) => Boolean(censusProfiles.profiles?.[area.wardCode])).length,
       generatedAt: generated.generatedAt || null,
+      profileGeneratedAt: censusProfiles.generatedAt || null,
       metricsDestinationPostcode: generated.destinationPostcode || null,
       arriveBy: generated.arriveBy || null,
       policeMonth: generated.policeMonth || null,
