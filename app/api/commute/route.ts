@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 
 const TFL_BASE = "https://api.tfl.gov.uk/Journey/JourneyResults";
-const PUBLIC_TRANSPORT_MODES = "public-bus,overground,train,tube,dlr,tram,walking";
+const PUBLIC_TRANSPORT_MODES = "public-bus,overground,train,tube,dlr,tram";
 const CACHE_TTL_MS = 60 * 60 * 1000;
+const REQUEST_TIMEOUT_MS = 8000;
 
 type RouteLeg = {
   mode: "walk" | "tube" | "bus" | "rail" | "dlr" | "overground" | "tram";
@@ -82,7 +83,6 @@ async function fetchJourney(
   destinationPostcode: string,
   arriveBy: string,
   modes: string,
-  useMultiModalCall: boolean,
 ) {
   const from = `${lat},${lng}`;
   const url = new URL(`${TFL_BASE}/${encodeURIComponent(from)}/to/${encodeURIComponent(destinationPostcode)}`);
@@ -91,10 +91,12 @@ async function fetchJourney(
   url.searchParams.set("time", arriveBy.replace(":", ""));
   url.searchParams.set("date", nextTuesday());
   url.searchParams.set("journeyPreference", "leasttime");
-  if (useMultiModalCall) url.searchParams.set("useMultiModalCall", "true");
   if (process.env.TFL_APP_KEY) url.searchParams.set("app_key", process.env.TFL_APP_KEY);
 
-  const response = await fetch(url, { cache: "no-store" });
+  const response = await fetch(url, {
+    cache: "no-store",
+    signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+  });
   if (!response.ok) throw new Error(`TfL Journey Planner returned ${response.status}`);
   return response.json();
 }
@@ -105,6 +107,9 @@ export async function GET(request: NextRequest) {
   const lng = Number(params.get("lng"));
   const destinationPostcode = String(params.get("destination") || "").trim().toUpperCase();
   const arriveBy = String(params.get("arriveBy") || "09:00").trim();
+  const requestedModes = new Set(String(params.get("modes") || "publicTransport").split(","));
+  const wantsTransit = requestedModes.has("publicTransport");
+  const wantsWalking = requestedModes.has("walking");
 
   if (!Number.isFinite(lat) || !Number.isFinite(lng) || !destinationPostcode) {
     return NextResponse.json({ error: "lat, lng and destination are required" }, { status: 400 });
@@ -114,34 +119,41 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Origin must be within the London region" }, { status: 400 });
   }
 
-  const cacheKey = `${lat.toFixed(4)}|${lng.toFixed(4)}|${destinationPostcode.replace(/\s+/g, "")}|${arriveBy}`;
+  const modeKey = `${wantsTransit ? "t" : ""}${wantsWalking ? "w" : ""}` || "none";
+  const cacheKey = `${lat.toFixed(4)}|${lng.toFixed(4)}|${destinationPostcode.replace(/\s+/g, "")}|${arriveBy}|${modeKey}`;
   const cached = cache.get(cacheKey);
   if (cached && cached.expiresAt > Date.now()) return NextResponse.json(cached.value);
 
   try {
-    const payload = await fetchJourney(lat, lng, destinationPostcode, arriveBy, PUBLIC_TRANSPORT_MODES, true);
-    const journeys = Array.isArray(payload?.journeys) ? payload.journeys : [];
-    const transitJourney = journeys
-      .filter(isPublicTransportJourney)
-      .sort((a: any, b: any) => Number(a?.duration || Infinity) - Number(b?.duration || Infinity))[0];
-    let walkingJourney = journeys
-      .filter(isWalkingJourney)
-      .sort((a: any, b: any) => Number(a?.duration || Infinity) - Number(b?.duration || Infinity))[0];
+    let publicTransport: CommuteOption | null = null;
+    let walking: CommuteOption | null = null;
 
-    if (!walkingJourney) {
-      const walkingPayload = await fetchJourney(lat, lng, destinationPostcode, arriveBy, "walking", false);
-      walkingJourney = Array.isArray(walkingPayload?.journeys) ? walkingPayload.journeys[0] : null;
+    if (wantsTransit) {
+      const payload = await fetchJourney(lat, lng, destinationPostcode, arriveBy, PUBLIC_TRANSPORT_MODES);
+      const journeys = Array.isArray(payload?.journeys) ? payload.journeys : [];
+      const transitJourney = journeys
+        .filter(isPublicTransportJourney)
+        .sort((a: any, b: any) => Number(a?.duration || Infinity) - Number(b?.duration || Infinity))[0];
+      publicTransport = normaliseJourney(transitJourney);
     }
 
-    const value = {
-      publicTransport: normaliseJourney(transitJourney),
-      walking: normaliseJourney(walkingJourney),
-    };
+    if (wantsWalking) {
+      const payload = await fetchJourney(lat, lng, destinationPostcode, arriveBy, "walking");
+      const journeys = Array.isArray(payload?.journeys) ? payload.journeys : [];
+      const walkingJourney = journeys
+        .filter(isWalkingJourney)
+        .sort((a: any, b: any) => Number(a?.duration || Infinity) - Number(b?.duration || Infinity))[0]
+        || journeys[0];
+      walking = normaliseJourney(walkingJourney);
+    }
+
+    const value = { publicTransport, walking };
     cache.set(cacheKey, { value, expiresAt: Date.now() + CACHE_TTL_MS });
     return NextResponse.json(value);
   } catch (error) {
+    const message = error instanceof Error ? error.message : "Commute lookup failed";
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Commute lookup failed" },
+      { error: message.includes("timed out") ? "TfL Journey Planner timed out" : message },
       { status: 502 },
     );
   }
