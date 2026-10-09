@@ -12,7 +12,7 @@ const initialFilters: FilterState = {
   maxCommuteMinutes: 40,
   travelModes: ["publicTransport", "walking"],
   arriveBy: "09:00",
-  rentMin: 1500,
+  rentMin: 500,
   rentMax: 2600,
   bedroom: 1,
   maxCrime: 1000,
