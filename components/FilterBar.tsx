@@ -5,12 +5,14 @@ import type { BedroomOption, FilterState, TravelMode } from "@/lib/types";
 type Props = {
   filters: FilterState;
   onChange: (next: FilterState) => void;
+  onApply: () => void;
+  isDirty: boolean;
   londonCrimeAverage: number | null;
 };
 
 const bedroomOptions: BedroomOption[] = [1, 2, 3, "4+"];
 
-export function FilterBar({ filters, onChange, londonCrimeAverage }: Props) {
+export function FilterBar({ filters, onChange, onApply, isDirty, londonCrimeAverage }: Props) {
   const update = <K extends keyof FilterState>(key: K, value: FilterState[K]) => {
     onChange({ ...filters, [key]: value });
   };
@@ -25,7 +27,7 @@ export function FilterBar({ filters, onChange, londonCrimeAverage }: Props) {
       className="filterBar"
       aria-label="Search filters"
       style={{
-        gridTemplateColumns: "minmax(92px,.62fr) 96px 120px 122px minmax(150px,.95fr) 96px minmax(185px,1.05fr)",
+        gridTemplateColumns: "minmax(92px,.62fr) 96px 120px 122px minmax(150px,.95fr) 96px minmax(185px,1.05fr) 118px",
         gap: 8,
         overflowX: "auto",
       }}
@@ -108,6 +110,29 @@ export function FilterBar({ filters, onChange, londonCrimeAverage }: Props) {
           <option value={2500}>≤ 2,500 · Very high</option>
           <option value={9999}>Any · No limit</option>
         </select>
+      </div>
+
+      <div className="filterGroup compact" style={{ justifyContent: "flex-end" }}>
+        <span className="fieldLabel">&nbsp;</span>
+        <button
+          type="button"
+          onClick={onApply}
+          disabled={!isDirty}
+          style={{
+            height: 48,
+            border: 0,
+            borderRadius: 10,
+            background: "#17191c",
+            color: "#fff",
+            fontWeight: 700,
+            cursor: isDirty ? "pointer" : "default",
+            opacity: isDirty ? 1 : 0.38,
+            padding: "0 14px",
+            whiteSpace: "nowrap",
+          }}
+        >
+          Update results
+        </button>
       </div>
     </section>
   );
