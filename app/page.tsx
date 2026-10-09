@@ -66,6 +66,10 @@ export default function Home() {
   const [generatedAt, setGeneratedAt] = useState<string | null>(null);
   const [destinationPoint, setDestinationPoint] = useState<DestinationPoint>(DEFAULT_WORK_POINT);
 
+  const handleSelect = (id: string) => {
+    setSelectedId((current) => current === id ? null : id);
+  };
+
   useEffect(() => {
     let cancelled = false;
     setIsLoadingAreas(true);
@@ -175,7 +179,7 @@ export default function Home() {
           <LondonMap
             results={results}
             selectedId={selectedId}
-            onSelect={setSelectedId}
+            onSelect={handleSelect}
             destinationPostcode={filters.destinationPostcode}
           />
         ) : (
@@ -185,7 +189,7 @@ export default function Home() {
           filters={filters}
           results={results}
           selectedId={selectedId}
-          onSelect={setSelectedId}
+          onSelect={handleSelect}
           isLoading={isLoadingAreas}
           factsReadyCount={factsReadyCount}
           candidateCount={staticCandidates.length}
