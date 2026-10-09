@@ -1,0 +1,54 @@
+name: Refresh London Census profiles
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "40 4 2 1 *"
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/refresh-census-profiles.yml"
+      - "scripts/sync-census-profiles.mjs"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: london-census-profiles
+  cancel-in-progress: true
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build Census-based profiles for every London ward
+        run: node scripts/sync-census-profiles.mjs
+
+      - name: Validate production build
+        run: npm run build
+
+      - name: Commit refreshed profiles
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/ward-profiles.generated.json
+          if git diff --cached --quiet; then
+            echo "No profile changes to commit."
+          else
+            git commit -m "Refresh Census-based London area profiles"
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi
