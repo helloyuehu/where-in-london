@@ -30,8 +30,8 @@ function normalisePostcode(value: string) {
   return value.replace(/\s+/g, "").toUpperCase();
 }
 
-function commuteKey(area: LondonArea, postcode: string, arriveBy: string, travelModes: FilterState["travelModes"]) {
-  return `${area.id}|${normalisePostcode(postcode)}|${arriveBy}|${[...travelModes].sort().join(",")}`;
+function commuteKey(area: LondonArea, postcode: string, arriveBy: string, travelModeSignature: string) {
+  return `${area.id}|${normalisePostcode(postcode)}|${arriveBy}|${travelModeSignature}`;
 }
 
 export default function Home() {
@@ -45,6 +45,11 @@ export default function Home() {
   const [commuteLoadingCount, setCommuteLoadingCount] = useState(0);
   const [commuteErrorCount, setCommuteErrorCount] = useState(0);
   const commuteCacheRef = useRef(new Map<string, LondonArea["commute"]>());
+
+  const travelModeSignature = useMemo(
+    () => [...filters.travelModes].sort().join(","),
+    [filters.travelModes],
+  );
 
   useEffect(() => {
     let cancelled = false;
@@ -92,7 +97,7 @@ export default function Home() {
   useEffect(() => {
     setRuntimeCommutes({});
     setCommuteErrorCount(0);
-  }, [filters.destinationPostcode, filters.arriveBy, filters.travelModes]);
+  }, [filters.destinationPostcode, filters.arriveBy, travelModeSignature]);
 
   useEffect(() => {
     const postcode = filters.destinationPostcode.trim();
@@ -105,7 +110,7 @@ export default function Home() {
     let cancelled = false;
 
     const pending = staticCandidates.filter((area) => {
-      const cached = commuteCacheRef.current.get(commuteKey(area, postcode, filters.arriveBy, filters.travelModes));
+      const cached = commuteCacheRef.current.get(commuteKey(area, postcode, filters.arriveBy, travelModeSignature));
       if (cached) return false;
       if (destinationChanged) return true;
       return filters.travelModes.some((mode) => !area.commute[mode]);
@@ -113,7 +118,7 @@ export default function Home() {
 
     const cachedUpdates: Record<string, LondonArea["commute"]> = {};
     for (const area of staticCandidates) {
-      const cached = commuteCacheRef.current.get(commuteKey(area, postcode, filters.arriveBy, filters.travelModes));
+      const cached = commuteCacheRef.current.get(commuteKey(area, postcode, filters.arriveBy, travelModeSignature));
       if (cached) cachedUpdates[area.id] = cached;
     }
     if (Object.keys(cachedUpdates).length) {
@@ -139,7 +144,7 @@ export default function Home() {
           lng: String(area.referencePoint.lng),
           destination: postcode,
           arriveBy: filters.arriveBy,
-          modes: filters.travelModes.join(","),
+          modes: travelModeSignature,
         });
 
         try {
@@ -154,7 +159,7 @@ export default function Home() {
             walking: payload.walking || null,
           };
           commuteCacheRef.current.set(
-            commuteKey(area, postcode, filters.arriveBy, filters.travelModes),
+            commuteKey(area, postcode, filters.arriveBy, travelModeSignature),
             commute,
           );
           if (!cancelled) {
@@ -180,7 +185,7 @@ export default function Home() {
     staticCandidateSignature,
     filters.destinationPostcode,
     filters.arriveBy,
-    filters.travelModes,
+    travelModeSignature,
     destinationChanged,
   ]);
 
