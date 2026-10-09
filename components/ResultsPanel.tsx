@@ -49,17 +49,26 @@ export function ResultsPanel({
   const nonMatches = results.filter((result) => result.state === "fail");
   const pending = results.filter((result) => result.state === "pending");
   const refreshed = updatedLabel(generatedAt);
+  const metricsPreparing = !isLoading && results.length > 0 && readyCount === 0 && pending.length > 0;
 
   return (
     <aside className="resultsPanel">
       <div className="resultsHeader">
         <div>
           <p className="eyebrow">London rental fit</p>
-          <h1>{isLoading ? "Loading London…" : `${matches.length} match`}</h1>
+          <h1>
+            {isLoading
+              ? "Loading London…"
+              : metricsPreparing
+                ? "Preparing London data…"
+                : `${matches.length} ${matches.length === 1 ? "area matches" : "areas match"}`}
+          </h1>
           <p className="coverageCopy">
             {results.length > 0
-              ? `${results.length} London areas · ${readyCount} fully evaluated${pending.length ? ` · ${pending.length} awaiting data` : ""}`
-              : "Loading official London area boundaries and metrics…"}
+              ? metricsPreparing
+                ? `${results.length} Greater London areas loaded · commute, rent and crime metrics are being prepared`
+                : `${results.length} Greater London areas · ${readyCount} fully evaluated${pending.length ? ` · ${pending.length} awaiting metrics` : ""}`
+              : "Loading official Greater London boundaries and metrics…"}
           </p>
         </div>
         <span className="demoBadge live">Official boundaries</span>
@@ -75,6 +84,13 @@ export function ResultsPanel({
       </div>
 
       <div className="resultsList">
+        {metricsPreparing && (
+          <div className="emptyState">
+            <strong>Metrics refresh in progress</strong>
+            <p>All Greater London area boundaries are available. Match results appear once commute, rent and reported-crime data has been calculated.</p>
+          </div>
+        )}
+
         <ResultSection
           title="Matches"
           detail="Meets every active constraint"
@@ -83,7 +99,7 @@ export function ResultsPanel({
           onSelect={onSelect}
         />
 
-        {!isLoading && matches.length === 0 && results.length > 0 && pending.length === 0 && (
+        {!isLoading && !metricsPreparing && matches.length === 0 && results.length > 0 && pending.length === 0 && (
           <div className="emptyState">
             <strong>No exact matches</strong>
             <p>Try widening one constraint. Almost matches are shown below.</p>
@@ -109,8 +125,8 @@ export function ResultsPanel({
         />
 
         <ResultSection
-          title="Data pending"
-          detail="Area boundary is available; one or more metrics are still loading"
+          title="Metrics pending"
+          detail="Boundary is ready; one or more factual metrics are still unavailable"
           results={pending}
           selectedId={selectedId}
           onSelect={onSelect}
