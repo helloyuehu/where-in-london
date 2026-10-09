@@ -5,11 +5,12 @@ import type { BedroomOption, FilterState, TravelMode } from "@/lib/types";
 type Props = {
   filters: FilterState;
   onChange: (next: FilterState) => void;
+  londonCrimeAverage: number | null;
 };
 
 const bedroomOptions: BedroomOption[] = ["studio", 1, 2, 3, "4+"];
 
-export function FilterBar({ filters, onChange }: Props) {
+export function FilterBar({ filters, onChange, londonCrimeAverage }: Props) {
   const update = <K extends keyof FilterState>(key: K, value: FilterState[K]) => {
     onChange({ ...filters, [key]: value });
   };
@@ -71,7 +72,11 @@ export function FilterBar({ filters, onChange }: Props) {
 
       <div className="filterGroup crimeGroup">
         <label htmlFor="crime">Max reported crime / month</label>
-        <span className="filterSubheader">London average · 75 reported crimes / month</span>
+        <span className="filterSubheader">
+          {londonCrimeAverage === null
+            ? "London average · loading official data"
+            : `London average · ${londonCrimeAverage} reported crimes / month`}
+        </span>
         <select id="crime" value={filters.maxCrime} onChange={(event) => update("maxCrime", Number(event.target.value))}>
           <option value={49}>Under 50</option>
           <option value={99}>50–99</option>
