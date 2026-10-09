@@ -29,27 +29,17 @@ function statusLabel(result: MatchResult) {
   return `Waiting for ${result.missingCriteria.join(", ") || "data"}`;
 }
 
-function updatedLabel(value: string | null) {
-  if (!value) return null;
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return null;
-  return new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric" }).format(date);
-}
-
 export function ResultsPanel({
-  filters,
   results,
   selectedId,
   onSelect,
   isLoading,
   factsReadyCount,
-  generatedAt,
 }: Props) {
   const matches = results.filter((result) => result.state === "match");
   const nearMatches = results.filter((result) => result.state === "near");
   const nonMatches = results.filter((result) => result.state === "fail");
   const pending = results.filter((result) => result.state === "pending");
-  const refreshed = updatedLabel(generatedAt);
   const factsLoading = !isLoading && results.length > 0 && factsReadyCount === 0;
 
   useEffect(() => {
@@ -76,15 +66,6 @@ export function ResultsPanel({
           <p className="eyebrow">London rental fit</p>
           <h1>{heading}</h1>
         </div>
-      </div>
-
-      <div className="summaryChips" aria-label="Active filters">
-        <span>≤ {filters.maxCommuteMinutes} min to {filters.destinationPostcode || "work"}</span>
-        <span>{filters.travelModes.includes("publicTransport") ? "Transit" : ""}{filters.travelModes.length === 2 ? " + " : ""}{filters.travelModes.includes("walking") ? "Walk" : ""}</span>
-        <span>£{filters.rentMin.toLocaleString("en-GB")}–£{filters.rentMax.toLocaleString("en-GB")}</span>
-        <span>{String(filters.bedroom) === "studio" ? "Studio" : `${filters.bedroom} bed`}</span>
-        <span>≤ {filters.maxCrime === 9999 ? "Any" : filters.maxCrime} crimes / month</span>
-        {refreshed && <span>Facts updated {refreshed}</span>}
       </div>
 
       <div className="resultsList">
