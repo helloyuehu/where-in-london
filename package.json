@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "sync:wards": "node scripts/sync-ward-metrics.mjs"
+    "sync:wards": "node --env-file-if-exists=.env.local scripts/sync-ward-metrics.mjs"
   },
   "dependencies": {
     "maplibre-gl": "^5.3.0",
