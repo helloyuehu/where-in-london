@@ -171,12 +171,16 @@ export default function Home() {
       />
 
       <div className="workspace">
-        <LondonMap
-          results={results}
-          selectedId={selectedId}
-          onSelect={setSelectedId}
-          destinationPostcode={filters.destinationPostcode}
-        />
+        {areas.length > 0 ? (
+          <LondonMap
+            results={results}
+            selectedId={selectedId}
+            onSelect={setSelectedId}
+            destinationPostcode={filters.destinationPostcode}
+          />
+        ) : (
+          <div className="mapShell" aria-label="Loading Greater London map" />
+        )}
         <ResultsPanel
           filters={filters}
           results={results}
