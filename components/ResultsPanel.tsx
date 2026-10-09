@@ -7,6 +7,7 @@ type Props = {
   results: MatchResult[];
   selectedId: string | null;
   onSelect: (id: string) => void;
+  dataMode: "demo" | "generated";
 };
 
 function routeLabel(leg: RouteLeg) {
@@ -30,7 +31,7 @@ function statusLabel(result: MatchResult) {
   return `Misses ${result.failedCriteria.length} criteria`;
 }
 
-export function ResultsPanel({ filters, results, selectedId, onSelect }: Props) {
+export function ResultsPanel({ filters, results, selectedId, onSelect, dataMode }: Props) {
   const matches = results.filter((result) => result.allMatch);
   const nearMatches = results.filter((result) => !result.allMatch && result.failedCriteria.length === 1);
   const nonMatches = results.filter((result) => result.failedCriteria.length >= 2);
@@ -41,9 +42,15 @@ export function ResultsPanel({ filters, results, selectedId, onSelect }: Props) 
         <div>
           <p className="eyebrow">London rental fit</p>
           <h1>{matches.length} match</h1>
-          <p className="coverageCopy">{results.length} areas evaluated · all London wards shown on map</p>
+          <p className="coverageCopy">
+            {dataMode === "generated"
+              ? `${results.length} London wards evaluated`
+              : `${results.length} demo areas evaluated · all London wards shown on map`}
+          </p>
         </div>
-        <span className="demoBadge">V1 · fixture metrics</span>
+        <span className={`demoBadge ${dataMode === "generated" ? "live" : ""}`}>
+          {dataMode === "generated" ? "Ward data" : "V1 · fixture metrics"}
+        </span>
       </div>
 
       <div className="summaryChips" aria-label="Active filters">
