@@ -108,6 +108,42 @@ export function LondonMap({ results, selectedId, onSelect, destinationPostcode }
   );
 
   useEffect(() => {
+    const postcode = destinationPostcode.trim();
+    if (!postcode) {
+      workLocationRef.current = null;
+      setWorkLocation(null);
+      return;
+    }
+
+    const controller = new AbortController();
+    const timer = window.setTimeout(async () => {
+      try {
+        const response = await fetch(`/api/postcode?postcode=${encodeURIComponent(postcode)}`, { signal: controller.signal });
+        if (!response.ok) throw new Error("Postcode not found");
+        const location = (await response.json()) as WorkLocation;
+        workLocationRef.current = location;
+        setWorkLocation(location);
+
+        const map = mapRef.current;
+        if (map?.isStyleLoaded()) {
+          const source = map.getSource("work-location") as GeoJSONSource | undefined;
+          source?.setData(makeWorkCollection(location));
+        }
+      } catch {
+        if (!controller.signal.aborted) {
+          workLocationRef.current = null;
+          setWorkLocation(null);
+        }
+      }
+    }, 250);
+
+    return () => {
+      window.clearTimeout(timer);
+      controller.abort();
+    };
+  }, [destinationPostcode]);
+
+  useEffect(() => {
     if (!containerRef.current || mapRef.current) return;
 
     const container = containerRef.current;
@@ -125,7 +161,7 @@ export function LondonMap({ results, selectedId, onSelect, destinationPostcode }
       attributionControl: true,
     });
 
-    map.addControl(new maplibregl.NavigationControl({ visualizePitch: false }), "bottom-left");
+    map.addControl(new maplibregl.NavigationControl({ visualizePitch: false }), "top-left");
 
     const fitToLondon = () => {
       map.resize();
@@ -151,10 +187,7 @@ export function LondonMap({ results, selectedId, onSelect, destinationPostcode }
           id: "london-wards-fill",
           type: "fill",
           source: "london-wards",
-          paint: {
-            "fill-color": "#eef1f4",
-            "fill-opacity": 0.78,
-          },
+          paint: { "fill-color": "#eef1f4", "fill-opacity": 0.78 },
         });
         map.addLayer({
           id: "london-wards-line",
@@ -183,28 +216,13 @@ export function LondonMap({ results, selectedId, onSelect, destinationPostcode }
             "text-halo-width": 1.2,
           },
         });
-
         map.addLayer({
           id: "area-polygons-fill",
           type: "fill",
           source: "area-polygons",
           paint: {
-            "fill-color": [
-              "match",
-              ["get", "state"],
-              "match", "#16855b",
-              "near", "#e39a2d",
-              "fail", "#8f98a3",
-              "#8f98a3",
-            ],
-            "fill-opacity": [
-              "match",
-              ["get", "state"],
-              "match", 0.68,
-              "near", 0.6,
-              "fail", 0.45,
-              0.45,
-            ],
+            "fill-color": ["match", ["get", "state"], "match", "#16855b", "near", "#e39a2d", "fail", "#8f98a3", "#8f98a3"],
+            "fill-opacity": ["match", ["get", "state"], "match", 0.68, "near", 0.6, "fail", 0.45, 0.45],
           },
         });
         map.addLayer({
@@ -226,19 +244,9 @@ export function LondonMap({ results, selectedId, onSelect, destinationPostcode }
           id: "area-polygon-labels",
           type: "symbol",
           source: "area-polygons",
-          layout: {
-            "text-field": ["get", "name"],
-            "text-size": 11,
-            "text-allow-overlap": false,
-            "text-padding": 4,
-          },
-          paint: {
-            "text-color": "#111111",
-            "text-halo-color": "rgba(255,255,255,0.96)",
-            "text-halo-width": 2,
-          },
+          layout: { "text-field": ["get", "name"], "text-size": 11, "text-allow-overlap": false, "text-padding": 4 },
+          paint: { "text-color": "#111111", "text-halo-color": "rgba(255,255,255,0.96)", "text-halo-width": 2 },
         });
-
         map.addLayer({
           id: "london-boundary-line",
           type: "line",
@@ -249,28 +257,14 @@ export function LondonMap({ results, selectedId, onSelect, destinationPostcode }
           id: "work-pin",
           type: "circle",
           source: "work-location",
-          paint: {
-            "circle-radius": 8,
-            "circle-color": "#ffffff",
-            "circle-stroke-color": "#111111",
-            "circle-stroke-width": 3,
-          },
+          paint: { "circle-radius": 8, "circle-color": "#ffffff", "circle-stroke-color": "#111111", "circle-stroke-width": 3 },
         });
         map.addLayer({
           id: "work-label",
           type: "symbol",
           source: "work-location",
-          layout: {
-            "text-field": ["concat", "Work · ", ["get", "postcode"]],
-            "text-size": 12,
-            "text-offset": [0, 1.3],
-            "text-anchor": "top",
-          },
-          paint: {
-            "text-color": "#111111",
-            "text-halo-color": "#ffffff",
-            "text-halo-width": 2,
-          },
+          layout: { "text-field": ["concat", "Work · ", ["get", "postcode"]], "text-size": 12, "text-offset": [0, 1.3], "text-anchor": "top" },
+          paint: { "text-color": "#111111", "text-halo-color": "#ffffff", "text-halo-width": 2 },
         });
 
         map.on("mouseenter", "area-polygons-fill", () => { map.getCanvas().style.cursor = "pointer"; });
@@ -290,11 +284,8 @@ export function LondonMap({ results, selectedId, onSelect, destinationPostcode }
       }
     });
 
-    const resizeObserver = typeof ResizeObserver !== "undefined"
-      ? new ResizeObserver(() => map.resize())
-      : null;
+    const resizeObserver = typeof ResizeObserver !== "undefined" ? new ResizeObserver(() => map.resize()) : null;
     resizeObserver?.observe(container);
-
     const handleWindowResize = () => map.resize();
     window.addEventListener("resize", handleWindowResize);
 
@@ -333,36 +324,6 @@ export function LondonMap({ results, selectedId, onSelect, destinationPostcode }
   }, [selectedId, results]);
 
   useEffect(() => {
-    const postcode = destinationPostcode.trim();
-    if (!postcode) {
-      workLocationRef.current = null;
-      setWorkLocation(null);
-      return;
-    }
-
-    const controller = new AbortController();
-    const timer = window.setTimeout(async () => {
-      try {
-        const response = await fetch(`/api/postcode?postcode=${encodeURIComponent(postcode)}`, { signal: controller.signal });
-        if (!response.ok) throw new Error("Postcode not found");
-        const location = (await response.json()) as WorkLocation;
-        workLocationRef.current = location;
-        setWorkLocation(location);
-      } catch {
-        if (!controller.signal.aborted) {
-          workLocationRef.current = null;
-          setWorkLocation(null);
-        }
-      }
-    }, 250);
-
-    return () => {
-      window.clearTimeout(timer);
-      controller.abort();
-    };
-  }, [destinationPostcode]);
-
-  useEffect(() => {
     const map = mapRef.current;
     if (!map || !map.isStyleLoaded()) return;
     const source = map.getSource("work-location") as GeoJSONSource | undefined;
@@ -391,7 +352,7 @@ export function LondonMap({ results, selectedId, onSelect, destinationPostcode }
       </div>
 
       <div className="geographyNote">
-        {geographyStatus === "ready" && "All official London wards are shown. Coloured wards are the areas with current metrics."}
+        {geographyStatus === "ready" && "All official London wards are shown. Coloured wards are areas with complete metrics."}
         {geographyStatus === "loading" && "Loading official London geography…"}
         {geographyStatus === "fallback" && "Official geography unavailable"}
       </div>
