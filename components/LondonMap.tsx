@@ -50,8 +50,9 @@ function decorateWards(
           ...(feature.properties ?? {}),
           id: code,
           name: result?.area.name || feature.properties?.ward_name || code,
-          state: result?.state || "pending",
-          dataStatus: result?.area.dataStatus || "pending",
+          state: result?.state || "context",
+          dataStatus: result?.area.dataStatus || "context",
+          inModel: Boolean(result),
         },
       };
     }),
@@ -172,17 +173,19 @@ export function LondonMap({ results, selectedId, onSelect, destinationPostcode }
               "match", "#16855b",
               "near", "#e39a2d",
               "fail", "#8f98a3",
-              "pending", "#eef1f4",
-              "#eef1f4",
+              "pending", "#d9e0e7",
+              "context", "#f5f6f7",
+              "#f5f6f7",
             ],
             "fill-opacity": [
               "match",
               ["get", "state"],
-              "match", 0.78,
-              "near", 0.72,
-              "fail", 0.62,
-              "pending", 0.82,
-              0.82,
+              "match", 0.82,
+              "near", 0.76,
+              "fail", 0.68,
+              "pending", 0.76,
+              "context", 0.42,
+              0.42,
             ],
           },
         });
@@ -198,11 +201,22 @@ export function LondonMap({ results, selectedId, onSelect, destinationPostcode }
               "match", "#0c6442",
               "near", "#a96600",
               "fail", "#66717d",
-              "pending", "#b6bec7",
-              "#b6bec7",
+              "pending", "#8d99a6",
+              "context", "#d8dde2",
+              "#d8dde2",
             ],
-            "line-opacity": 0.92,
-            "line-width": ["interpolate", ["linear"], ["zoom"], 8.4, 0.65, 12, 1.25],
+            "line-opacity": [
+              "case",
+              ["boolean", ["get", "inModel"], false],
+              0.96,
+              0.62,
+            ],
+            "line-width": [
+              "case",
+              ["boolean", ["get", "inModel"], false],
+              ["interpolate", ["linear"], ["zoom"], 8.4, 1.05, 12, 1.7],
+              ["interpolate", ["linear"], ["zoom"], 8.4, 0.45, 12, 0.8],
+            ],
           },
         });
 
@@ -210,17 +224,18 @@ export function LondonMap({ results, selectedId, onSelect, destinationPostcode }
           id: "london-ward-labels",
           type: "symbol",
           source: "london-wards",
-          minzoom: 9.65,
+          minzoom: 9.35,
+          filter: ["==", ["get", "inModel"], true],
           layout: {
             "text-field": ["get", "name"],
-            "text-size": ["interpolate", ["linear"], ["zoom"], 9.65, 9, 13, 12],
+            "text-size": ["interpolate", ["linear"], ["zoom"], 9.35, 9, 13, 12],
             "text-allow-overlap": false,
             "text-padding": 3,
           },
           paint: {
-            "text-color": "#2b3137",
-            "text-halo-color": "rgba(255,255,255,0.94)",
-            "text-halo-width": 1.4,
+            "text-color": "#242a30",
+            "text-halo-color": "rgba(255,255,255,0.95)",
+            "text-halo-width": 1.5,
           },
         });
 
@@ -282,11 +297,16 @@ export function LondonMap({ results, selectedId, onSelect, destinationPostcode }
           },
         });
 
-        map.on("mouseenter", "london-wards-fill", () => { map.getCanvas().style.cursor = "pointer"; });
+        map.on("mouseenter", "london-wards-fill", (event) => {
+          const inModel = Boolean(event.features?.[0]?.properties?.inModel);
+          map.getCanvas().style.cursor = inModel ? "pointer" : "";
+        });
         map.on("mouseleave", "london-wards-fill", () => { map.getCanvas().style.cursor = ""; });
         map.on("click", "london-wards-fill", (event) => {
-          const id = event.features?.[0]?.properties?.id;
-          if (typeof id === "string" && id) onSelect(id);
+          const feature = event.features?.[0];
+          const id = feature?.properties?.id;
+          const inModel = Boolean(feature?.properties?.inModel);
+          if (inModel && typeof id === "string" && id) onSelect(id);
         });
 
         const workSource = map.getSource("work-location") as GeoJSONSource | undefined;
@@ -353,24 +373,24 @@ export function LondonMap({ results, selectedId, onSelect, destinationPostcode }
 
   return (
     <div className="mapShell">
-      <div ref={containerRef} className="mapCanvas" aria-label="Greater London ward map" />
+      <div ref={containerRef} className="mapCanvas" aria-label="Greater London area map" />
 
       <div className="mapCoverageBadge">
-        <strong>{wardCount ?? "…"} London wards</strong>
-        <span>{results.length ? `${results.length} loaded into the decision model` : "Loading ward model…"}</span>
+        <strong>{results.length || "…"} decision areas</strong>
+        <span>{wardCount ? `${wardCount} official wards kept as London context` : "Loading London context…"}</span>
       </div>
 
       <div className="mapLegend">
         <span><i className="legendSwatch match" />Match <b>{matches}</b></span>
         <span><i className="legendSwatch near" />Almost <b>{almost}</b></span>
         <span><i className="legendSwatch fail" />Doesn’t match <b>{noMatch}</b></span>
-        {pending > 0 && <span><i className="legendSwatch unevaluated" />Data pending <b>{pending}</b></span>}
+        {pending > 0 && <span><i className="legendSwatch unevaluated" />Checking <b>{pending}</b></span>}
         <span><i className="legendDot work" />Work</span>
       </div>
 
       <div className="geographyNote">
-        {geographyStatus === "ready" && "Every official London ward is selectable. Ward boundaries: GLA 2022 electoral wards."}
-        {geographyStatus === "loading" && "Loading all official London wards…"}
+        {geographyStatus === "ready" && "Representative neighbourhood-scale areas use official ward polygons. Other London wards stay visible as geographic context."}
+        {geographyStatus === "loading" && "Loading Greater London geography…"}
         {geographyStatus === "fallback" && "Official London geography is temporarily unavailable."}
       </div>
     </div>
