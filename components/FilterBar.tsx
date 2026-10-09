@@ -27,13 +27,15 @@ export function FilterBar({ filters, onChange, onApply, isDirty, londonCrimeAver
       className="filterBar"
       aria-label="Search filters"
       style={{
-        gridTemplateColumns: "minmax(0,.72fr) 88px 112px 108px minmax(0,1.05fr) 90px minmax(0,1.12fr) 112px",
-        gap: 7,
+        display: "flex",
+        flexWrap: "wrap",
+        gap: 8,
         overflowX: "hidden",
         minWidth: 0,
+        alignItems: "flex-end",
       }}
     >
-      <div className="filterGroup destinationGroup">
+      <div className="filterGroup destinationGroup" style={{ flex: "1 1 150px", minWidth: 140 }}>
         <label htmlFor="postcode">Work postcode</label>
         <div className="inlineInput">
           <span className="pinDot" aria-hidden="true" />
@@ -41,7 +43,7 @@ export function FilterBar({ filters, onChange, onApply, isDirty, londonCrimeAver
         </div>
       </div>
 
-      <div className="filterGroup compact">
+      <div className="filterGroup compact" style={{ flex: "0 1 104px", minWidth: 96 }}>
         <label htmlFor="commute" style={{ whiteSpace: "nowrap" }}>Max commute</label>
         <div className="numberSuffix">
           <input id="commute" type="number" min={5} max={180} value={filters.maxCommuteMinutes} onChange={(event) => update("maxCommuteMinutes", Number(event.target.value) || 5)} />
@@ -49,7 +51,7 @@ export function FilterBar({ filters, onChange, onApply, isDirty, londonCrimeAver
         </div>
       </div>
 
-      <div className="filterGroup travelModes">
+      <div className="filterGroup travelModes" style={{ flex: "0 1 124px", minWidth: 118 }}>
         <span className="fieldLabel">Travel by</span>
         <div className="segmented">
           <button type="button" className={filters.travelModes.includes("publicTransport") ? "active" : ""} onClick={() => toggleTravelMode("publicTransport")}>Transit</button>
@@ -57,7 +59,7 @@ export function FilterBar({ filters, onChange, onApply, isDirty, londonCrimeAver
         </div>
       </div>
 
-      <div className="filterGroup compact">
+      <div className="filterGroup compact" style={{ flex: "0 1 116px", minWidth: 110 }}>
         <label htmlFor="arrive">Arrive by</label>
         <input
           id="arrive"
@@ -68,16 +70,16 @@ export function FilterBar({ filters, onChange, onApply, isDirty, londonCrimeAver
         />
       </div>
 
-      <div className="filterGroup rentGroup">
+      <div className="filterGroup rentGroup" style={{ flex: "1.35 1 220px", minWidth: 210 }}>
         <span className="fieldLabel">Monthly rent</span>
-        <div className="rentInputs" style={{ gridTemplateColumns: "minmax(52px,1fr) auto minmax(52px,1fr)" }}>
+        <div className="rentInputs" style={{ gridTemplateColumns: "minmax(74px,1fr) auto minmax(74px,1fr)" }}>
           <div className="numberPrefix"><span>£</span><input aria-label="Minimum rent" type="number" step={50} value={filters.rentMin} onChange={(event) => update("rentMin", Number(event.target.value) || 0)} /></div>
           <span className="rangeDash">to</span>
           <div className="numberPrefix"><span>£</span><input aria-label="Maximum rent" type="number" step={50} value={filters.rentMax} onChange={(event) => update("rentMax", Number(event.target.value) || 0)} /></div>
         </div>
       </div>
 
-      <div className="filterGroup compact">
+      <div className="filterGroup compact" style={{ flex: "0 1 104px", minWidth: 100 }}>
         <label htmlFor="bedrooms">Bedrooms</label>
         <select id="bedrooms" value={String(filters.bedroom)} onChange={(event) => {
           const value = event.target.value;
@@ -90,11 +92,13 @@ export function FilterBar({ filters, onChange, onApply, isDirty, londonCrimeAver
       <div
         className="filterGroup crimeGroup"
         style={{
+          flex: "1.25 1 230px",
+          minWidth: 220,
           background: "#eef6ff",
           border: "1px solid #8bb8e8",
           borderRadius: 10,
           padding: "7px 8px 8px",
-          margin: "-7px 0 -8px",
+          margin: 0,
         }}
       >
         <label htmlFor="crime" style={{ color: "#165a9d", marginBottom: 4, whiteSpace: "nowrap" }}>Reported crime / month</label>
@@ -113,7 +117,7 @@ export function FilterBar({ filters, onChange, onApply, isDirty, londonCrimeAver
         </select>
       </div>
 
-      <div className="filterGroup compact" style={{ justifyContent: "flex-end" }}>
+      <div className="filterGroup compact" style={{ flex: "0 1 122px", minWidth: 118, justifyContent: "flex-end" }}>
         <span className="fieldLabel">&nbsp;</span>
         <button
           type="button"
