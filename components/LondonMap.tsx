@@ -175,7 +175,6 @@ export function LondonMap({ results, selectedId, onSelect, destinationPostcode }
   resultsRef.current = results;
   const [geographyStatus, setGeographyStatus] = useState<"loading" | "ready" | "fallback">("loading");
   const [workLocation, setWorkLocation] = useState<WorkLocation | null>(null);
-  const [wardCount, setWardCount] = useState<number | null>(null);
 
   const resultSignature = useMemo(
     () => results.map((result) => `${result.area.id}:${result.state}`).join("|"),
@@ -248,7 +247,6 @@ export function LondonMap({ results, selectedId, onSelect, destinationPostcode }
         if (!data.boundary || !data.wards) throw new Error("Geography response incomplete");
 
         wardsRef.current = data.wards;
-        setWardCount(data.wards.features.length);
         const currentResults = resultsRef.current;
 
         map.addSource("london-boundary", { type: "geojson", data: data.boundary });
@@ -424,11 +422,6 @@ export function LondonMap({ results, selectedId, onSelect, destinationPostcode }
   return (
     <div className="mapShell">
       <div ref={containerRef} className="mapCanvas" aria-label="Greater London area map" />
-
-      <div className="mapCoverageBadge">
-        <strong>{results.length || "…"} London living areas</strong>
-        <span>{wardCount ? `${wardCount} official wards grouped to cover the whole city` : "Loading London coverage…"}</span>
-      </div>
 
       <div className="mapLegend">
         <span><i className="legendSwatch match" />Match <b>{matches}</b></span>
