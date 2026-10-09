@@ -9,7 +9,7 @@ import { evaluateArea, rankResults } from "@/lib/filter";
 import type { FilterState } from "@/lib/types";
 
 const initialFilters: FilterState = {
-  destinationPostcode: "EC2A 3LT",
+  destinationPostcode: "W1D 3QW",
   maxCommuteMinutes: 40,
   travelModes: ["publicTransport", "walking"],
   arriveBy: "09:00",
