@@ -25,7 +25,7 @@ export function FilterBar({ filters, onChange }: Props) {
         <label htmlFor="postcode">Work postcode</label>
         <div className="inlineInput">
           <span className="pinDot" aria-hidden="true" />
-          <input id="postcode" value={filters.destinationPostcode} onChange={(event) => update("destinationPostcode", event.target.value.toUpperCase())} placeholder="EC2A 3LT" />
+          <input id="postcode" value={filters.destinationPostcode} onChange={(event) => update("destinationPostcode", event.target.value.toUpperCase())} placeholder="W1D 3QW" />
         </div>
       </div>
 
@@ -71,6 +71,7 @@ export function FilterBar({ filters, onChange }: Props) {
 
       <div className="filterGroup crimeGroup">
         <label htmlFor="crime">Max reported crime / month</label>
+        <span className="filterSubheader">London average · 75 reported crimes / month</span>
         <select id="crime" value={filters.maxCrime} onChange={(event) => update("maxCrime", Number(event.target.value))}>
           <option value={49}>Under 50</option>
           <option value={99}>50–99</option>
