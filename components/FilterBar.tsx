@@ -25,7 +25,7 @@ export function FilterBar({ filters, onChange, londonCrimeAverage }: Props) {
       className="filterBar"
       aria-label="Search filters"
       style={{
-        gridTemplateColumns: "minmax(102px,.7fr) 96px 120px 122px minmax(150px,.95fr) 84px minmax(185px,1.05fr)",
+        gridTemplateColumns: "minmax(92px,.62fr) 96px 120px 122px minmax(150px,.95fr) 96px minmax(185px,1.05fr)",
         gap: 8,
         overflowX: "auto",
       }}
