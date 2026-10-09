@@ -214,7 +214,7 @@ function AreaCard({
   const walking = area.commute.walking;
   const crime = area.crime;
   const boundary = area.boundaryName && area.boundaryName !== area.name ? ` · ${area.boundaryName} ward` : "";
-  const visibleTags = area.profile.tags.filter((tag) => tag.trim().toLowerCase() !== "private renting");
+  const visibleTags = area.profile.tags.filter((tag) => !tag.trim().toLowerCase().startsWith("private renting"));
 
   return (
     <button
