@@ -5,7 +5,7 @@ import type { Feature, FeatureCollection, Geometry, MultiPolygon, Polygon, Posit
 
 const GLA_WARDS = "https://gis.london.gov.uk/arcgis/rest/services/apps/webmap_context_layer/MapServer/9/query?where=1%3D1&outFields=ward_code%2Cward_name%2Cla_name%2Cla_gss_code&returnGeometry=true&outSR=4326&f=geojson";
 
-export const revalidate = 60 * 60 * 24;
+export const revalidate = 86400;
 
 type GeneratedWard = {
   id?: string;
