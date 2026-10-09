@@ -1,6 +1,8 @@
 "use client";
 
-import type { Criterion, FilterState, MatchResult } from "@/lib/types";
+import { useEffect } from "react";
+import { getAreaSummary } from "@/lib/area-summaries";
+import type { FilterState, MatchResult } from "@/lib/types";
 
 type Props = {
   filters: FilterState;
@@ -34,44 +36,6 @@ function updatedLabel(value: string | null) {
   return new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric" }).format(date);
 }
 
-function criterionName(criterion: Criterion) {
-  if (criterion === "commute") return "commute";
-  if (criterion === "rent") return "rent";
-  return "reported crime";
-}
-
-function readableList(items: string[]) {
-  if (items.length <= 1) return items[0] || "your current priorities";
-  if (items.length === 2) return `${items[0]} and ${items[1]}`;
-  return `${items.slice(0, -1).join(", ")} and ${items[items.length - 1]}`;
-}
-
-function areaFitSummary(result: MatchResult) {
-  const { area } = result;
-  const passed: string[] = [];
-  if (result.commuteMatches) passed.push("commute");
-  if (result.rentMatches) passed.push("rent");
-  if (result.crimeMatches) passed.push("reported crime");
-  const failed = result.failedCriteria.map(criterionName);
-
-  if (result.state === "match") {
-    return `${area.name} is a strong all-round fit for this search, meeting your commute, rent and reported-crime limits. It suits renters who want a balanced option without relaxing any of the current constraints.`;
-  }
-
-  if (result.state === "near") {
-    return `${area.name} performs well on ${readableList(passed)} but falls outside your ${failed[0]} limit. It suits renters who prioritise ${readableList(passed)} and are comfortable making one trade-off.`;
-  }
-
-  if (result.state === "fail") {
-    if (passed.length) {
-      return `${area.name} works best for renters prioritising ${readableList(passed)}, but it currently misses ${readableList(failed)}. Its main strengths in this search are the criteria it still passes.`;
-    }
-    return `${area.name} currently sits outside the active commute, rent and reported-crime limits. It is more suitable if you are willing to widen one or more of those constraints.`;
-  }
-
-  return `${area.name} has incomplete data for one or more active constraints, so its fit is not fully determined yet.`;
-}
-
 export function ResultsPanel({
   filters,
   results,
@@ -87,6 +51,17 @@ export function ResultsPanel({
   const pending = results.filter((result) => result.state === "pending");
   const refreshed = updatedLabel(generatedAt);
   const factsLoading = !isLoading && results.length > 0 && factsReadyCount === 0;
+
+  useEffect(() => {
+    if (!selectedId) return;
+    const frame = window.requestAnimationFrame(() => {
+      document.getElementById(`area-card-${selectedId}`)?.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
+      });
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [selectedId]);
 
   const heading = isLoading
     ? "Loading London…"
@@ -242,7 +217,12 @@ function AreaCard({
   const boundary = area.boundaryName && area.boundaryName !== area.name ? ` · ${area.boundaryName} ward` : "";
 
   return (
-    <button type="button" onClick={onSelect} className={`areaCard ${result.state} ${selected ? "selected" : ""}`}>
+    <button
+      id={`area-card-${area.id}`}
+      type="button"
+      onClick={onSelect}
+      className={`areaCard ${result.state} ${selected ? "selected" : ""}`}
+    >
       <div className="cardTopline">
         <div>
           <h2>{area.name}</h2>
@@ -251,7 +231,7 @@ function AreaCard({
         <span className={`matchPill ${result.state}`}>{statusLabel(result)}</span>
       </div>
 
-      <p className="areaSummary">{areaFitSummary(result)}</p>
+      <p className="areaSummary">{getAreaSummary(area.name, area.borough)}</p>
 
       <div className="metricGrid">
         <Metric
