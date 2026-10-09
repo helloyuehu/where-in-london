@@ -7,6 +7,14 @@ const GLA_WARDS = "https://gis.london.gov.uk/arcgis/rest/services/apps/webmap_co
 
 export const revalidate = 86400;
 
+const LONDON_BOROUGHS = new Set([
+  "barking and dagenham", "barnet", "bexley", "brent", "bromley", "camden", "city of london",
+  "croydon", "ealing", "enfield", "greenwich", "hackney", "hammersmith and fulham", "haringey",
+  "harrow", "havering", "hillingdon", "hounslow", "islington", "kensington and chelsea", "kingston upon thames",
+  "lambeth", "lewisham", "merton", "newham", "redbridge", "richmond upon thames", "southwark", "sutton",
+  "tower hamlets", "waltham forest", "wandsworth", "westminster",
+]);
+
 type GeneratedWard = {
   id?: string;
   wardCode?: string;
@@ -41,6 +49,23 @@ type CensusProfilePayload = {
   generatedAt?: string | null;
   profiles?: Record<string, CensusProfile>;
 };
+
+function normalise(value: unknown) {
+  return String(value || "")
+    .toLowerCase()
+    .replace(/&/g, "and")
+    .replace(/^royal borough of /, "")
+    .replace(/^london borough of /, "")
+    .replace(/^city of westminster$/, "westminster")
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+}
+
+function isLondonFeature(feature: Feature<Geometry>) {
+  const properties = feature.properties || {};
+  const borough = properties.la_name || properties.LA_NAME || properties.lad22nm || properties.LAD22NM;
+  return LONDON_BOROUGHS.has(normalise(borough));
+}
 
 function outerRings(geometry: Geometry): Position[][] {
   if (geometry.type === "Polygon") return [(geometry as Polygon).coordinates[0]];
@@ -115,14 +140,15 @@ export async function GET() {
     ]);
     if (!wardsResponse.ok) throw new Error("Official GLA ward request failed");
 
-    const wards = (await wardsResponse.json()) as FeatureCollection<Geometry>;
+    const allWards = (await wardsResponse.json()) as FeatureCollection<Geometry>;
+    const wardFeatures = allWards.features.filter(isLondonFeature);
     const generatedByCode = new Map<string, GeneratedWard>();
     for (const ward of generated.wards || []) {
       const code = ward.wardCode || ward.id;
       if (code) generatedByCode.set(code, ward);
     }
 
-    const areas = wards.features.map((feature: Feature<Geometry>, index) => {
+    const areas = wardFeatures.map((feature: Feature<Geometry>, index) => {
       const properties = feature.properties || {};
       const wardCode = String(properties.ward_code || `ward-${index + 1}`);
       const name = String(properties.ward_name || `Ward ${index + 1}`);
@@ -144,7 +170,7 @@ export async function GET() {
               summary: `${name} is an official electoral ward in ${borough}. Detailed demographic context is still being populated from official London data.`,
               tags: [borough],
             };
-      const hardMetricsReady = Boolean(commute.publicTransport && commute.walking && crime && rentByBedroom);
+      const hardMetricsReady = Boolean(commute.publicTransport && crime && rentByBedroom);
       const anyMetrics = Boolean(commute.publicTransport || commute.walking || crime || rentByBedroom);
 
       return {
