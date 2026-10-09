@@ -1,18 +1,39 @@
 # Ward data inputs
 
-The all-ward sync writes `lib/data/ward-metrics.generated.json`.
+The all-ward sync writes `lib/data/ward-metrics.generated.json` and the app automatically uses complete generated wards when available.
 
-It can fetch two data groups directly:
+## Geography
 
-- Geography: Greater London Authority ward GeoJSON
-- Reported crime: data.police.uk, latest available month, one-mile radius around the ward reference point
-- Commute: TfL Journey Planner, using `TFL_APP_KEY`
+Official Greater London Authority ward polygons.
 
-Two normalised official-data inputs are intentionally separate so the app does not invent values:
+## Reported crime
 
-## `data/ons-rents-by-borough.json`
+`data.police.uk` street-level crime, latest available month, using the standard one-mile radius around each ward reference point.
 
-Use the latest ONS Price Index of Private Rents local-authority values by bedroom count. Shape:
+## Commute
+
+Transport for London Journey Planner API. Put your personal TfL key in `.env.local`:
+
+```bash
+TFL_APP_KEY=your_key_here
+WORK_POSTCODE=W1D 3QW
+ARRIVE_BY=09:00
+SYNC_CONCURRENCY=4
+```
+
+`.env.local` is gitignored and must never be committed.
+
+Then run:
+
+```bash
+npm run sync:wards
+```
+
+## Rent
+
+Use the latest ONS Price Index of Private Rents property-size data. ONS publishes bedroom-level average private rents for local authorities in England and Wales. A ward therefore inherits its borough/local-authority rent value, and the UI must describe that as a borough-level proxy rather than a ward measurement.
+
+Normalised file: `data/ons-rents-by-borough.json`
 
 ```json
 {
@@ -26,20 +47,20 @@ Use the latest ONS Price Index of Private Rents local-authority values by bedroo
 }
 ```
 
-Values are average monthly private rent in GBP. A ward inherits its borough/local-authority rent value and the UI must label that geography honestly.
+## Area profile
 
-## `data/ward-profiles.json`
+Use current official GLA / ONS ward evidence. Suitable factual inputs include the London Datastore Census 2021 ward tables for population by age, household composition, accommodation type and tenure. Summaries should only compress supplied evidence and must not infer stereotypes.
 
-Use verified GLA / ONS ward-level evidence. Shape:
+Normalised file: `data/ward-profiles.json`
 
 ```json
 {
   "WARD_CODE": {
     "summary": "35–60 word factual summary based only on the supplied evidence.",
     "tags": ["..."],
-    "source": "GLA / ONS"
+    "source": "GLA Census 2021 ward estimates / ONS"
   }
 }
 ```
 
-Do not infer stereotypes or demographic claims that are absent from the source data.
+The sync marks a ward `complete` only when crime, public-transport commute, walking commute, rent and profile are all present. Incomplete wards remain visually labelled as not evaluated rather than receiving fabricated values.
