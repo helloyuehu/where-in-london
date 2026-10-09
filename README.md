@@ -1,4 +1,4 @@
-# where-in-london-v1
+# where-in-london
 
 **Where in London?**  
 *Find areas that fit your priorities.*
