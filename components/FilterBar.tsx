@@ -21,7 +21,15 @@ export function FilterBar({ filters, onChange, londonCrimeAverage }: Props) {
   };
 
   return (
-    <section className="filterBar" aria-label="Search filters">
+    <section
+      className="filterBar"
+      aria-label="Search filters"
+      style={{
+        gridTemplateColumns: "minmax(125px,.85fr) 86px 138px 92px minmax(188px,1.2fr) 96px minmax(178px,1.05fr)",
+        gap: 8,
+        overflowX: "hidden",
+      }}
+    >
       <div className="filterGroup destinationGroup">
         <label htmlFor="postcode">Work postcode</label>
         <div className="inlineInput">
@@ -53,7 +61,7 @@ export function FilterBar({ filters, onChange, londonCrimeAverage }: Props) {
 
       <div className="filterGroup rentGroup">
         <span className="fieldLabel">Monthly rent</span>
-        <div className="rentInputs">
+        <div className="rentInputs" style={{ gridTemplateColumns: "minmax(68px,1fr) auto minmax(68px,1fr)" }}>
           <div className="numberPrefix"><span>£</span><input aria-label="Minimum rent" type="number" step={50} value={filters.rentMin} onChange={(event) => update("rentMin", Number(event.target.value) || 0)} /></div>
           <span className="rangeDash">to</span>
           <div className="numberPrefix"><span>£</span><input aria-label="Maximum rent" type="number" step={50} value={filters.rentMax} onChange={(event) => update("rentMax", Number(event.target.value) || 0)} /></div>
@@ -70,19 +78,28 @@ export function FilterBar({ filters, onChange, londonCrimeAverage }: Props) {
         </select>
       </div>
 
-      <div className="filterGroup crimeGroup">
-        <label htmlFor="crime">Max reported crime / month</label>
-        <span className="filterSubheader">
+      <div
+        className="filterGroup crimeGroup"
+        style={{
+          background: "#fff8ea",
+          border: "1px solid #e4b65f",
+          borderRadius: 10,
+          padding: "7px 8px 8px",
+          margin: "-7px 0 -8px",
+        }}
+      >
+        <label htmlFor="crime" style={{ color: "#8a5700", marginBottom: 4 }}>Reported crime / month</label>
+        <span className="filterSubheader" style={{ color: "#9a6a1b", marginBottom: 4 }}>
           {londonCrimeAverage === null
-            ? "London area average · loading official data"
-            : `London area average · ${londonCrimeAverage} reported crimes / month`}
+            ? "London area average · loading"
+            : `London area average · ${londonCrimeAverage}`}
         </span>
         <select id="crime" value={filters.maxCrime} onChange={(event) => update("maxCrime", Number(event.target.value))}>
-          <option value={49}>≤ 49</option>
-          <option value={99}>≤ 99</option>
-          <option value={199}>≤ 199</option>
-          <option value={299}>≤ 299</option>
-          <option value={499}>≤ 499</option>
+          <option value={250}>≤ 250</option>
+          <option value={500}>≤ 500</option>
+          <option value={1000}>≤ 1,000</option>
+          <option value={1500}>≤ 1,500</option>
+          <option value={2500}>≤ 2,500</option>
           <option value={9999}>Any</option>
         </select>
       </div>
