@@ -104,17 +104,21 @@ function selectRepresentativeAreas(features, priorities) {
     .filter((row) => row.point && LONDON_BOROUGH_SET.has(normalise(row.borough)));
 
   const used = new Set();
+  const usedLabels = new Set();
   const selected = [];
 
   function add(row, displayName = row.officialName) {
     const code = String(row.feature.properties?.ward_code || row.feature.properties?.WARD_CODE || row.officialName);
-    if (used.has(code) || selected.length >= TARGET_AREA_COUNT) return false;
+    const labelKey = normalise(displayName);
+    if (used.has(code) || usedLabels.has(labelKey) || selected.length >= TARGET_AREA_COUNT) return false;
     used.add(code);
+    usedLabels.add(labelKey);
     selected.push({ ...row, displayName });
     return true;
   }
 
   function priorityMatch(priority) {
+    if (usedLabels.has(normalise(priority.label))) return null;
     const query = normalise(priority.query || priority.label);
     const borough = normalise(priority.borough);
     return rows.find((row) => {
@@ -129,10 +133,7 @@ function selectRepresentativeAreas(features, priorities) {
   for (const borough of LONDON_BOROUGHS) {
     const preferred = priorities.find((item) => normalise(item.borough) === normalise(borough));
     const matched = preferred ? priorityMatch(preferred) : null;
-    if (matched) {
-      add(matched, preferred.label || matched.officialName);
-      continue;
-    }
+    if (matched && add(matched, preferred.label || matched.officialName)) continue;
 
     const boroughRows = rows.filter((row) => normalise(row.borough) === normalise(borough));
     if (!boroughRows.length) continue;
@@ -141,7 +142,7 @@ function selectRepresentativeAreas(features, priorities) {
       lng: boroughRows.reduce((sum, row) => sum + row.point.lng, 0) / boroughRows.length,
     };
     boroughRows.sort((a, b) => distanceSq(a.point, centre) - distanceSq(b.point, centre));
-    add(boroughRows[0]);
+    boroughRows.some((row) => add(row));
   }
 
   // Then favour recognisable neighbourhood names from the curated priority list.
@@ -157,7 +158,7 @@ function selectRepresentativeAreas(features, priorities) {
     let bestScore = -1;
     for (const row of rows) {
       const code = String(row.feature.properties?.ward_code || row.officialName);
-      if (used.has(code)) continue;
+      if (used.has(code) || usedLabels.has(normalise(row.officialName))) continue;
       const score = selected.length
         ? Math.min(...selected.map((chosen) => distanceSq(row.point, chosen.point)))
         : 0;
