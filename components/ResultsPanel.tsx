@@ -18,9 +18,19 @@ function money(value: number | null) {
   return value === null ? "No data" : `£${value.toLocaleString("en-GB")}`;
 }
 
+function crimeComparison(total: number, average: number) {
+  if (!average) return "No London comparison";
+  const delta = Math.round(((total - average) / average) * 100);
+  if (Math.abs(delta) < 2) return "about London average";
+  return `${Math.abs(delta)}% ${delta < 0 ? "below" : "above"} London average`;
+}
+
 export function ResultsPanel({ filters, results, selectedId, onSelect }: Props) {
   const matches = results.filter((result) => result.allMatch);
   const nearMatches = results.filter((result) => !result.allMatch && result.failedCriteria.length === 1);
+  const londonCrimeAverage = results.length
+    ? Math.round(results.reduce((sum, result) => sum + result.area.crime.total, 0) / results.length)
+    : 0;
 
   return (
     <aside className="resultsPanel">
@@ -38,11 +48,18 @@ export function ResultsPanel({ filters, results, selectedId, onSelect }: Props) 
         <span>£{filters.rentMin.toLocaleString("en-GB")}–£{filters.rentMax.toLocaleString("en-GB")}</span>
         <span>{String(filters.bedroom) === "studio" ? "Studio" : `${filters.bedroom} bed`}</span>
         <span>≤ {filters.maxCrime === 9999 ? "Any" : filters.maxCrime} crimes / month</span>
+        <span>London demo avg: {londonCrimeAverage} / month</span>
       </div>
 
       <div className="resultsList">
         {matches.map((result) => (
-          <AreaCard key={result.area.id} result={result} selected={selectedId === result.area.id} onSelect={() => onSelect(result.area.id)} />
+          <AreaCard
+            key={result.area.id}
+            result={result}
+            selected={selectedId === result.area.id}
+            onSelect={() => onSelect(result.area.id)}
+            londonCrimeAverage={londonCrimeAverage}
+          />
         ))}
 
         {matches.length === 0 && (
@@ -59,7 +76,14 @@ export function ResultsPanel({ filters, results, selectedId, onSelect }: Props) 
               <small>Misses one criterion</small>
             </div>
             {nearMatches.slice(0, 6).map((result) => (
-              <AreaCard key={result.area.id} result={result} selected={selectedId === result.area.id} onSelect={() => onSelect(result.area.id)} compact />
+              <AreaCard
+                key={result.area.id}
+                result={result}
+                selected={selectedId === result.area.id}
+                onSelect={() => onSelect(result.area.id)}
+                compact
+                londonCrimeAverage={londonCrimeAverage}
+              />
             ))}
           </div>
         )}
@@ -68,7 +92,19 @@ export function ResultsPanel({ filters, results, selectedId, onSelect }: Props) 
   );
 }
 
-function AreaCard({ result, selected, onSelect, compact = false }: { result: MatchResult; selected: boolean; onSelect: () => void; compact?: boolean }) {
+function AreaCard({
+  result,
+  selected,
+  onSelect,
+  londonCrimeAverage,
+  compact = false,
+}: {
+  result: MatchResult;
+  selected: boolean;
+  onSelect: () => void;
+  londonCrimeAverage: number;
+  compact?: boolean;
+}) {
   const { area } = result;
   const transit = area.commute.publicTransport;
   const route = transit.legs?.map(routeLabel).join(" → ");
@@ -94,14 +130,22 @@ function AreaCard({ result, selected, onSelect, compact = false }: { result: Mat
         <div className={result.rentMatches ? "metric" : "metric fail"}>
           <span>Rent</span>
           <strong>{money(result.rent)}</strong>
-          <small>/ month · {String(result.area.id) && "selected bed"}</small>
+          <small>/ month · selected bed</small>
         </div>
         <div className={result.crimeMatches ? "metric" : "metric fail"}>
           <span>Reported crime</span>
           <strong>{area.crime.total}</strong>
-          <small>{area.crime.month} · within {area.crime.radiusMiles} mile</small>
+          <small>{crimeComparison(area.crime.total, londonCrimeAverage)}</small>
         </div>
       </div>
+
+      {!compact && (
+        <div className="crimeContext">
+          <span>London demo average</span>
+          <strong>{londonCrimeAverage} reported crimes / month</strong>
+          <small>Same fixture measurement basis as the area cards. This will be replaced by real Police.uk data.</small>
+        </div>
+      )}
 
       {!compact && route && <div className="routeLine"><span className="routeIcon">↳</span><span>{route}</span></div>}
 
