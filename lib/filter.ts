@@ -39,13 +39,18 @@ export function evaluateArea(area: LondonArea, filters: FilterState): MatchResul
   const failedCriteria = checks.filter(([, value]) => value === false).map(([criterion]) => criterion);
   const missingCriteria = checks.filter(([, value]) => value === null).map(([criterion]) => criterion);
   const allMatch = missingCriteria.length === 0 && failedCriteria.length === 0;
-  const state = missingCriteria.length > 0
-    ? "pending"
-    : allMatch
-      ? "match"
-      : failedCriteria.length === 1
-        ? "near"
-        : "fail";
+
+  let state: MatchResult["state"];
+  if (missingCriteria.length > 0) {
+    // If two known constraints already fail, commute cannot rescue the area.
+    state = failedCriteria.length >= 2 ? "fail" : "pending";
+  } else if (allMatch) {
+    state = "match";
+  } else if (failedCriteria.length === 1) {
+    state = "near";
+  } else {
+    state = "fail";
+  }
 
   return {
     area,
@@ -61,7 +66,7 @@ export function evaluateArea(area: LondonArea, filters: FilterState): MatchResul
 }
 
 export function rankResults(results: MatchResult[]): MatchResult[] {
-  const stateOrder = { match: 0, near: 1, fail: 2, pending: 3 } as const;
+  const stateOrder = { match: 0, near: 1, pending: 2, fail: 3 } as const;
   return [...results].sort((a, b) => {
     if (stateOrder[a.state] !== stateOrder[b.state]) return stateOrder[a.state] - stateOrder[b.state];
     if (a.failedCriteria.length !== b.failedCriteria.length) return a.failedCriteria.length - b.failedCriteria.length;
