@@ -60,6 +60,7 @@ function estimatedCommute(area: LondonArea, destination: DestinationPoint): Lond
 
 export default function Home() {
   const [filters, setFilters] = useState<FilterState>(initialFilters);
+  const [draftFilters, setDraftFilters] = useState<FilterState>(initialFilters);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [areas, setAreas] = useState<LondonArea[]>([]);
   const [isLoadingAreas, setIsLoadingAreas] = useState(true);
@@ -68,6 +69,31 @@ export default function Home() {
 
   const handleSelect = (id: string) => {
     setSelectedId((current) => current === id ? null : id);
+  };
+
+  const filtersDirty = JSON.stringify(draftFilters) !== JSON.stringify(filters);
+
+  const handleApplyFilters = async () => {
+    const nextFilters = { ...draftFilters };
+    const postcodeChanged = nextFilters.destinationPostcode.trim().toUpperCase()
+      !== filters.destinationPostcode.trim().toUpperCase();
+
+    if (postcodeChanged) {
+      try {
+        const response = await fetch(`/api/postcode?postcode=${encodeURIComponent(nextFilters.destinationPostcode.trim())}`, {
+          cache: "no-store",
+        });
+        if (!response.ok) throw new Error("Postcode lookup failed");
+        const payload = await response.json() as { lat: number; lng: number };
+        if (!Number.isFinite(payload.lat) || !Number.isFinite(payload.lng)) throw new Error("Invalid postcode result");
+        setDestinationPoint({ lat: payload.lat, lng: payload.lng });
+      } catch {
+        return;
+      }
+    }
+
+    setFilters(nextFilters);
+    setSelectedId(null);
   };
 
   useEffect(() => {
@@ -93,35 +119,6 @@ export default function Home() {
 
     return () => { cancelled = true; };
   }, []);
-
-  useEffect(() => {
-    const postcode = filters.destinationPostcode.trim();
-    if (!postcode) return;
-
-    const controller = new AbortController();
-    const timer = window.setTimeout(async () => {
-      try {
-        const response = await fetch(`/api/postcode?postcode=${encodeURIComponent(postcode)}`, {
-          signal: controller.signal,
-          cache: "no-store",
-        });
-        if (!response.ok) throw new Error("Postcode lookup failed");
-        const payload = await response.json() as { lat: number; lng: number };
-        if (Number.isFinite(payload.lat) && Number.isFinite(payload.lng)) {
-          setDestinationPoint({ lat: payload.lat, lng: payload.lng });
-        }
-      } catch {
-        if (!controller.signal.aborted && postcode.replace(/\s+/g, "").toUpperCase() === "W1D3QW") {
-          setDestinationPoint(DEFAULT_WORK_POINT);
-        }
-      }
-    }, 250);
-
-    return () => {
-      window.clearTimeout(timer);
-      controller.abort();
-    };
-  }, [filters.destinationPostcode]);
 
   const effectiveAreas = useMemo(
     () => areas.map((area) => ({
@@ -169,8 +166,10 @@ export default function Home() {
       </header>
 
       <FilterBar
-        filters={filters}
-        onChange={setFilters}
+        filters={draftFilters}
+        onChange={setDraftFilters}
+        onApply={handleApplyFilters}
+        isDirty={filtersDirty}
         londonCrimeAverage={londonCrimeAverage}
       />
 
