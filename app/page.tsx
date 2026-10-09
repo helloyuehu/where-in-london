@@ -44,7 +44,12 @@ export default function Home() {
       <FilterBar filters={filters} onChange={setFilters} />
 
       <div className="workspace">
-        <LondonMap results={results} selectedId={selectedId} onSelect={setSelectedId} />
+        <LondonMap
+          results={results}
+          selectedId={selectedId}
+          onSelect={setSelectedId}
+          destinationPostcode={filters.destinationPostcode}
+        />
         <ResultsPanel filters={filters} results={results} selectedId={selectedId} onSelect={setSelectedId} />
       </div>
     </main>
