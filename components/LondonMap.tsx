@@ -97,6 +97,7 @@ export function LondonMap({ results, selectedId, onSelect, destinationPostcode }
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
   const wardsRef = useRef<FeatureCollection<Geometry> | null>(null);
+  const workLocationRef = useRef<WorkLocation | null>(null);
   const [geographyStatus, setGeographyStatus] = useState<"loading" | "ready" | "fallback">("loading");
   const [workLocation, setWorkLocation] = useState<WorkLocation | null>(null);
   const [wardCount, setWardCount] = useState<number | null>(null);
@@ -144,7 +145,7 @@ export function LondonMap({ results, selectedId, onSelect, destinationPostcode }
         map.addSource("london-boundary", { type: "geojson", data: data.boundary });
         map.addSource("london-wards", { type: "geojson", data: data.wards });
         map.addSource("area-polygons", { type: "geojson", data: makeAreaPolygonCollection(data.wards, results) });
-        map.addSource("work-location", { type: "geojson", data: makeWorkCollection(null) });
+        map.addSource("work-location", { type: "geojson", data: makeWorkCollection(workLocationRef.current) });
 
         map.addLayer({
           id: "london-wards-fill",
@@ -279,6 +280,9 @@ export function LondonMap({ results, selectedId, onSelect, destinationPostcode }
           if (typeof id === "string") onSelect(id);
         });
 
+        const workSource = map.getSource("work-location") as GeoJSONSource | undefined;
+        workSource?.setData(makeWorkCollection(workLocationRef.current));
+
         window.requestAnimationFrame(fitToLondon);
         setGeographyStatus("ready");
       } catch {
@@ -331,6 +335,7 @@ export function LondonMap({ results, selectedId, onSelect, destinationPostcode }
   useEffect(() => {
     const postcode = destinationPostcode.trim();
     if (!postcode) {
+      workLocationRef.current = null;
       setWorkLocation(null);
       return;
     }
@@ -341,11 +346,15 @@ export function LondonMap({ results, selectedId, onSelect, destinationPostcode }
         const response = await fetch(`/api/postcode?postcode=${encodeURIComponent(postcode)}`, { signal: controller.signal });
         if (!response.ok) throw new Error("Postcode not found");
         const location = (await response.json()) as WorkLocation;
+        workLocationRef.current = location;
         setWorkLocation(location);
       } catch {
-        if (!controller.signal.aborted) setWorkLocation(null);
+        if (!controller.signal.aborted) {
+          workLocationRef.current = null;
+          setWorkLocation(null);
+        }
       }
-    }, 350);
+    }, 250);
 
     return () => {
       window.clearTimeout(timer);
@@ -382,7 +391,7 @@ export function LondonMap({ results, selectedId, onSelect, destinationPostcode }
       </div>
 
       <div className="geographyNote">
-        {geographyStatus === "ready" && "All official London wards are shown. Coloured wards are the areas with current demo metrics."}
+        {geographyStatus === "ready" && "All official London wards are shown. Coloured wards are the areas with current metrics."}
         {geographyStatus === "loading" && "Loading official London geography…"}
         {geographyStatus === "fallback" && "Official geography unavailable"}
       </div>
