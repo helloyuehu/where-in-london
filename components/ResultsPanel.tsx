@@ -62,10 +62,7 @@ export function ResultsPanel({
   return (
     <aside className="resultsPanel">
       <div className="resultsHeader">
-        <div>
-          <p className="eyebrow">London rental fit</p>
-          <h1>{heading}</h1>
-        </div>
+        <h1>{heading}</h1>
       </div>
 
       <div className="resultsList">
@@ -81,6 +78,7 @@ export function ResultsPanel({
           results={matches}
           selectedId={selectedId}
           onSelect={onSelect}
+          hideHeading
         />
 
         {!isLoading && !factsLoading && matches.length === 0 && results.length > 0 && pending.length === 0 && (
@@ -128,6 +126,7 @@ function ResultSection({
   selectedId,
   onSelect,
   compact = false,
+  hideHeading = false,
 }: {
   title: string;
   detail?: string;
@@ -135,15 +134,18 @@ function ResultSection({
   selectedId: string | null;
   onSelect: (id: string) => void;
   compact?: boolean;
+  hideHeading?: boolean;
 }) {
   if (!results.length) return null;
 
   return (
     <section className="resultSection">
-      <div className="sectionHeading">
-        <span>{title} <b>{results.length}</b></span>
-        {detail && <small>{detail}</small>}
-      </div>
+      {!hideHeading && (
+        <div className="sectionHeading">
+          <span>{title} <b>{results.length}</b></span>
+          {detail && <small>{detail}</small>}
+        </div>
+      )}
       {results.map((result) => (
         <AreaCard
           key={result.area.id}
