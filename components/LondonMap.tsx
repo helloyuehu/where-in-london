@@ -171,6 +171,8 @@ export function LondonMap({ results, selectedId, onSelect, destinationPostcode }
   const mapRef = useRef<MapLibreMap | null>(null);
   const wardsRef = useRef<FeatureCollection<Geometry> | null>(null);
   const workLocationRef = useRef<WorkLocation | null>(null);
+  const resultsRef = useRef(results);
+  resultsRef.current = results;
   const [geographyStatus, setGeographyStatus] = useState<"loading" | "ready" | "fallback">("loading");
   const [workLocation, setWorkLocation] = useState<WorkLocation | null>(null);
   const [wardCount, setWardCount] = useState<number | null>(null);
@@ -247,11 +249,12 @@ export function LondonMap({ results, selectedId, onSelect, destinationPostcode }
 
         wardsRef.current = data.wards;
         setWardCount(data.wards.features.length);
+        const currentResults = resultsRef.current;
 
         map.addSource("london-boundary", { type: "geojson", data: data.boundary });
         map.addSource("london-outside", { type: "geojson", data: makeOutsideMask(data.boundary) });
-        map.addSource("london-wards", { type: "geojson", data: decorateWards(data.wards, results) });
-        map.addSource("result-labels", { type: "geojson", data: makeResultLabels(results) });
+        map.addSource("london-wards", { type: "geojson", data: decorateWards(data.wards, currentResults) });
+        map.addSource("result-labels", { type: "geojson", data: makeResultLabels(currentResults) });
         map.addSource("work-location", { type: "geojson", data: makeWorkCollection(workLocationRef.current) });
 
         map.addLayer({
