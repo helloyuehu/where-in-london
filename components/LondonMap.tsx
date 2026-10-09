@@ -385,9 +385,9 @@ export function LondonMap({ results, selectedId, onSelect, destinationPostcode }
       </div>
 
       <div className="geographyNote">
-        {geographyStatus === "ready" && "The 80 decision areas are expanded across neighbouring official wards so the whole of Greater London is covered without gaps."}
+        {geographyStatus === "ready" && "Sources · GLA ward geography · ONS private rents · Police.uk reported crime · Postcodes.io. Commute uses a distance-based estimate."}
         {geographyStatus === "loading" && "Loading Greater London geography…"}
-        {geographyStatus === "fallback" && "Official London geography is temporarily unavailable."}
+        {geographyStatus === "fallback" && "Sources · ONS private rents · Police.uk reported crime · Postcodes.io. Official London geography is temporarily unavailable."}
       </div>
     </div>
   );
