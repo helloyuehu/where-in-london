@@ -42,14 +42,15 @@ button { color: inherit; }
 .rangeDash { font-size: 11px; color: var(--muted); }
 
 .workspace { min-height: 0; display: grid; grid-template-columns: minmax(0, 68fr) minmax(340px, 32fr); gap: 0; }
-.mapShell { position: relative; min-width: 0; min-height: 680px; background: #e9e8e4; border-right: 1px solid var(--border); }
+.mapShell { position: relative; min-width: 0; min-height: 680px; background: #e9e8e4; border-right: 1px solid var(--border); overflow: hidden; }
 .mapCanvas { position: absolute; inset: 0; }
 .mapLegend { position: absolute; left: 14px; top: 14px; display: flex; gap: 10px; background: rgba(255,255,255,.94); border: 1px solid var(--border); border-radius: 9px; padding: 8px 10px; font-size: 11px; box-shadow: 0 3px 14px rgba(0,0,0,.05); }
 .mapLegend span { display: flex; align-items: center; gap: 6px; }
 .legendDot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
 .legendDot.match { background: #191919; }
 .legendDot.near { background: var(--warm); }
-.geographyNote { position: absolute; left: 14px; bottom: 14px; background: rgba(255,255,255,.94); border: 1px solid var(--border); border-radius: 8px; padding: 7px 9px; font-size: 10px; color: var(--muted); max-width: 240px; }
+.legendDot.work { background: #fff; border: 2px solid #191919; }
+.geographyNote { position: absolute; left: 14px; bottom: 14px; background: rgba(255,255,255,.94); border: 1px solid var(--border); border-radius: 8px; padding: 7px 9px; font-size: 10px; color: var(--muted); max-width: 280px; }
 
 .resultsPanel { min-height: 0; background: #faf9f7; display: flex; flex-direction: column; }
 .resultsHeader { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 18px 18px 12px; border-bottom: 1px solid var(--border); background: #fff; }
@@ -75,6 +76,10 @@ button { color: inherit; }
 .metric span { display: block; color: var(--muted); font-size: 9px; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
 .metric strong { display: block; font-size: 14px; }
 .metric small { display: block; color: var(--muted); margin-top: 2px; font-size: 9px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.crimeContext { margin-top: 9px; padding: 9px 10px; border-radius: 9px; background: #f5f4f1; border: 1px solid #e9e6e0; }
+.crimeContext span { display: block; font-size: 9px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
+.crimeContext strong { display: block; margin-top: 2px; font-size: 11px; }
+.crimeContext small { display: block; margin-top: 2px; color: var(--muted); font-size: 9px; line-height: 1.35; }
 .routeLine { display: flex; gap: 7px; align-items: flex-start; margin-top: 10px; color: #4f4c47; font-size: 10px; line-height: 1.4; }
 .routeIcon { color: #8c877f; }
 .tagRow { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 11px; }
