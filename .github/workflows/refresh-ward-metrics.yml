@@ -14,12 +14,18 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: london-ward-metrics
+  cancel-in-progress: true
+
 jobs:
   refresh:
     runs-on: ubuntu-latest
     timeout-minutes: 120
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - uses: actions/setup-node@v4
         with:
@@ -49,5 +55,6 @@ jobs:
             echo "No metric changes to commit."
           else
             git commit -m "Refresh official London ward metrics"
-            git push
+            git pull --rebase origin main
+            git push origin HEAD:main
           fi
