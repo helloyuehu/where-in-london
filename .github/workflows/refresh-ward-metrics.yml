@@ -1,4 +1,4 @@
-name: Refresh London ward metrics
+name: Refresh London area facts
 
 on:
   workflow_dispatch:
@@ -10,19 +10,20 @@ on:
       - ".github/workflows/refresh-ward-metrics.yml"
       - "scripts/sync-ward-metrics.mjs"
       - "scripts/run-london-ward-metrics.mjs"
+      - "data/area-priorities.json"
       - "package.json"
 
 permissions:
   contents: write
 
 concurrency:
-  group: london-ward-metrics
+  group: london-area-facts
   cancel-in-progress: true
 
 jobs:
   refresh:
     runs-on: ubuntu-latest
-    timeout-minutes: 120
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
         with:
@@ -36,13 +37,15 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Refresh official Greater London ward metrics
+      - name: Refresh rent + crime for representative London areas
         run: npm run sync:wards
         env:
           TFL_APP_KEY: ${{ secrets.TFL_APP_KEY }}
           WORK_POSTCODE: W1D 3QW
           ARRIVE_BY: "09:00"
-          SYNC_CONCURRENCY: "6"
+          TARGET_AREA_COUNT: "80"
+          SYNC_CONCURRENCY: "8"
+          SYNC_COMMUTE: "0"
 
       - name: Validate production build
         run: npm run build
@@ -55,7 +58,7 @@ jobs:
           if git diff --cached --quiet; then
             echo "No metric changes to commit."
           else
-            git commit -m "Refresh official Greater London ward metrics"
+            git commit -m "Refresh representative London area facts"
             git reset --hard HEAD
             git pull --rebase origin main
             git push origin HEAD:main
