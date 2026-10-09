@@ -8,7 +8,7 @@ type Props = {
   londonCrimeAverage: number | null;
 };
 
-const bedroomOptions: BedroomOption[] = ["studio", 1, 2, 3, "4+"];
+const bedroomOptions: BedroomOption[] = [1, 2, 3, "4+"];
 
 export function FilterBar({ filters, onChange, londonCrimeAverage }: Props) {
   const update = <K extends keyof FilterState>(key: K, value: FilterState[K]) => {
@@ -78,9 +78,9 @@ export function FilterBar({ filters, onChange, londonCrimeAverage }: Props) {
         <label htmlFor="bedrooms">Bedrooms</label>
         <select id="bedrooms" value={String(filters.bedroom)} onChange={(event) => {
           const value = event.target.value;
-          update("bedroom", value === "studio" || value === "4+" ? value : Number(value) as BedroomOption);
+          update("bedroom", value === "4+" ? value : Number(value) as BedroomOption);
         }}>
-          {bedroomOptions.map((option) => <option key={String(option)} value={String(option)}>{option === "studio" ? "Studio" : `${option} bed`}</option>)}
+          {bedroomOptions.map((option) => <option key={String(option)} value={String(option)}>{`${option} bed`}</option>)}
         </select>
       </div>
 
