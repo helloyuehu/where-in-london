@@ -99,8 +99,12 @@ export function LondonMap({ results, selectedId, onSelect, destinationPostcode }
   const wardsRef = useRef<FeatureCollection<Geometry> | null>(null);
   const [geographyStatus, setGeographyStatus] = useState<"loading" | "ready" | "fallback">("loading");
   const [workLocation, setWorkLocation] = useState<WorkLocation | null>(null);
+  const [wardCount, setWardCount] = useState<number | null>(null);
 
-  const resultSignature = useMemo(() => results.map((result) => `${result.area.id}:${result.allMatch}:${result.failedCriteria.length}`).join("|"), [results]);
+  const resultSignature = useMemo(
+    () => results.map((result) => `${result.area.id}:${result.allMatch}:${result.failedCriteria.length}`).join("|"),
+    [results],
+  );
 
   useEffect(() => {
     if (!containerRef.current || mapRef.current) return;
@@ -110,9 +114,9 @@ export function LondonMap({ results, selectedId, onSelect, destinationPostcode }
       container,
       style: "https://demotiles.maplibre.org/style.json",
       bounds: LONDON_BOUNDS,
-      fitBoundsOptions: { padding: 24 },
+      fitBoundsOptions: { padding: 22 },
       maxBounds: LONDON_BOUNDS,
-      minZoom: 8.6,
+      minZoom: 8.55,
       maxZoom: 15,
       scrollZoom: true,
       dragPan: true,
@@ -124,7 +128,7 @@ export function LondonMap({ results, selectedId, onSelect, destinationPostcode }
 
     const fitToLondon = () => {
       map.resize();
-      map.fitBounds(LONDON_BOUNDS, { padding: 24, duration: 0 });
+      map.fitBounds(LONDON_BOUNDS, { padding: 22, duration: 0 });
     };
 
     map.on("load", async () => {
@@ -135,6 +139,8 @@ export function LondonMap({ results, selectedId, onSelect, destinationPostcode }
         if (!data.boundary || !data.wards) throw new Error("Geography response incomplete");
 
         wardsRef.current = data.wards;
+        setWardCount(data.wards.features.length);
+
         map.addSource("london-boundary", { type: "geojson", data: data.boundary });
         map.addSource("london-wards", { type: "geojson", data: data.wards });
         map.addSource("area-polygons", { type: "geojson", data: makeAreaPolygonCollection(data.wards, results) });
@@ -144,14 +150,39 @@ export function LondonMap({ results, selectedId, onSelect, destinationPostcode }
           id: "london-wards-fill",
           type: "fill",
           source: "london-wards",
-          paint: { "fill-color": "#ffffff", "fill-opacity": 0.16 },
+          paint: {
+            "fill-color": "#eef1f4",
+            "fill-opacity": 0.78,
+          },
         });
         map.addLayer({
           id: "london-wards-line",
           type: "line",
           source: "london-wards",
-          paint: { "line-color": "#8d8d8d", "line-opacity": 0.3, "line-width": 0.7 },
+          paint: {
+            "line-color": "#b8bec6",
+            "line-opacity": 0.72,
+            "line-width": ["interpolate", ["linear"], ["zoom"], 8.5, 0.55, 12, 1.05],
+          },
         });
+        map.addLayer({
+          id: "london-ward-labels",
+          type: "symbol",
+          source: "london-wards",
+          minzoom: 10.2,
+          layout: {
+            "text-field": ["get", "ward_name"],
+            "text-size": ["interpolate", ["linear"], ["zoom"], 10.2, 9, 13, 12],
+            "text-allow-overlap": false,
+            "text-padding": 2,
+          },
+          paint: {
+            "text-color": "#737b84",
+            "text-halo-color": "rgba(255,255,255,0.92)",
+            "text-halo-width": 1.2,
+          },
+        });
+
         map.addLayer({
           id: "area-polygons-fill",
           type: "fill",
@@ -160,16 +191,18 @@ export function LondonMap({ results, selectedId, onSelect, destinationPostcode }
             "fill-color": [
               "match",
               ["get", "state"],
-              "match", "#202020",
-              "near", "#9c8f7c",
-              "#d7d7d7",
+              "match", "#16855b",
+              "near", "#e39a2d",
+              "fail", "#8f98a3",
+              "#8f98a3",
             ],
             "fill-opacity": [
               "match",
               ["get", "state"],
-              "match", 0.42,
-              "near", 0.3,
-              0.16,
+              "match", 0.68,
+              "near", 0.6,
+              "fail", 0.45,
+              0.45,
             ],
           },
         });
@@ -178,32 +211,38 @@ export function LondonMap({ results, selectedId, onSelect, destinationPostcode }
           type: "line",
           source: "area-polygons",
           paint: {
-            "line-color": ["case", ["==", ["get", "id"], selectedId ?? ""], "#111111", "#4c4c4c"],
-            "line-width": ["case", ["==", ["get", "id"], selectedId ?? ""], 3, 1.2],
-            "line-opacity": 0.9,
+            "line-color": [
+              "case",
+              ["==", ["get", "id"], selectedId ?? ""],
+              "#111111",
+              ["match", ["get", "state"], "match", "#0f6b48", "near", "#b96d00", "fail", "#69727c", "#69727c"],
+            ],
+            "line-width": ["case", ["==", ["get", "id"], selectedId ?? ""], 3.5, 1.7],
+            "line-opacity": 1,
           },
         });
         map.addLayer({
           id: "area-polygon-labels",
           type: "symbol",
           source: "area-polygons",
-          filter: ["!=", ["get", "state"], "fail"],
           layout: {
             "text-field": ["get", "name"],
             "text-size": 11,
             "text-allow-overlap": false,
+            "text-padding": 4,
           },
           paint: {
-            "text-color": "#171717",
-            "text-halo-color": "#ffffff",
-            "text-halo-width": 1.5,
+            "text-color": "#111111",
+            "text-halo-color": "rgba(255,255,255,0.96)",
+            "text-halo-width": 2,
           },
         });
+
         map.addLayer({
           id: "london-boundary-line",
           type: "line",
           source: "london-boundary",
-          paint: { "line-color": "#222222", "line-opacity": 0.8, "line-width": 2 },
+          paint: { "line-color": "#1f2933", "line-opacity": 0.9, "line-width": 2.2 },
         });
         map.addLayer({
           id: "work-pin",
@@ -275,8 +314,13 @@ export function LondonMap({ results, selectedId, onSelect, destinationPostcode }
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !map.isStyleLoaded() || !map.getLayer("area-polygons-line")) return;
-    map.setPaintProperty("area-polygons-line", "line-color", ["case", ["==", ["get", "id"], selectedId ?? ""], "#111111", "#4c4c4c"]);
-    map.setPaintProperty("area-polygons-line", "line-width", ["case", ["==", ["get", "id"], selectedId ?? ""], 3, 1.2]);
+    map.setPaintProperty("area-polygons-line", "line-color", [
+      "case",
+      ["==", ["get", "id"], selectedId ?? ""],
+      "#111111",
+      ["match", ["get", "state"], "match", "#0f6b48", "near", "#b96d00", "fail", "#69727c", "#69727c"],
+    ]);
+    map.setPaintProperty("area-polygons-line", "line-width", ["case", ["==", ["get", "id"], selectedId ?? ""], 3.5, 1.7]);
 
     if (!selectedId) return;
     const selected = results.find((result) => result.area.id === selectedId);
@@ -316,16 +360,29 @@ export function LondonMap({ results, selectedId, onSelect, destinationPostcode }
     source?.setData(makeWorkCollection(workLocation));
   }, [workLocation]);
 
+  const matches = results.filter((result) => result.allMatch).length;
+  const almost = results.filter((result) => !result.allMatch && result.failedCriteria.length === 1).length;
+  const noMatch = results.length - matches - almost;
+
   return (
     <div className="mapShell">
       <div ref={containerRef} className="mapCanvas" aria-label="Greater London map" />
+
+      <div className="mapCoverageBadge">
+        <strong>{wardCount ?? "…"} wards shown</strong>
+        <span>{results.length} currently evaluated</span>
+      </div>
+
       <div className="mapLegend">
-        <span><i className="legendDot match" />Match</span>
-        <span><i className="legendDot near" />Almost</span>
+        <span><i className="legendSwatch match" />Match <b>{matches}</b></span>
+        <span><i className="legendSwatch near" />Almost <b>{almost}</b></span>
+        <span><i className="legendSwatch fail" />Doesn’t match <b>{noMatch}</b></span>
+        <span><i className="legendSwatch unevaluated" />Not evaluated</span>
         <span><i className="legendDot work" />Work</span>
       </div>
+
       <div className="geographyNote">
-        {geographyStatus === "ready" && "Greater London only · official GLA ward geography"}
+        {geographyStatus === "ready" && "All official London wards are shown. Coloured wards are the areas with current demo metrics."}
         {geographyStatus === "loading" && "Loading official London geography…"}
         {geographyStatus === "fallback" && "Official geography unavailable"}
       </div>
