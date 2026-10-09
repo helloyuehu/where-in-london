@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 const GLA_BOUNDARY = "https://gis.london.gov.uk/arcgis/rest/services/apps/webmap_context_layer/MapServer/0/query?where=1%3D1&outFields=*&returnGeometry=true&outSR=4326&f=geojson";
 const GLA_WARDS = "https://gis.london.gov.uk/arcgis/rest/services/apps/webmap_context_layer/MapServer/9/query?where=1%3D1&outFields=ward_code%2Cward_name%2Cla_name%2Cla_gss_code&returnGeometry=true&outSR=4326&f=geojson";
 
-export const revalidate = 60 * 60 * 24;
+export const revalidate = 86400;
 
 export async function GET() {
   try {
