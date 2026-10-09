@@ -7,6 +7,7 @@ const POLICE_DATES = "https://data.police.uk/api/crimes-street-dates";
 const POLICE_CRIME = "https://data.police.uk/api/crimes-street/all-crime";
 const TFL_BASE = "https://api.tfl.gov.uk/Journey/JourneyResults";
 const ONS_RENT_DATASET = "https://www.ons.gov.uk/economy/inflationandpriceindices/datasets/priceindexofprivaterentsukmonthlypricestatistics";
+const PUBLIC_TRANSPORT_MODES = "public-bus,overground,train,tube,dlr,tram,walking";
 
 const destinationPostcode = process.env.WORK_POSTCODE || "W1D 3QW";
 const arriveBy = (process.env.ARRIVE_BY || "09:00").replace(":", "");
@@ -199,19 +200,51 @@ function scheduleTflRequest(task) {
   return scheduled;
 }
 
-async function tflJourney(point, mode) {
+function isWalkingJourney(journey) {
+  return Array.isArray(journey?.legs)
+    && journey.legs.length > 0
+    && journey.legs.every((leg) => normaliseMode(leg?.mode?.name) === "walk");
+}
+
+function isPublicTransportJourney(journey) {
+  return Array.isArray(journey?.legs)
+    && journey.legs.some((leg) => normaliseMode(leg?.mode?.name) !== "walk");
+}
+
+async function tflRequest(point, mode, useMultiModalCall = false) {
   return scheduleTflRequest(async () => {
     const from = `${point.lat},${point.lng}`;
     const url = new URL(`${TFL_BASE}/${encodeURIComponent(from)}/to/${encodeURIComponent(destinationPostcode)}`);
-    if (mode === "walking") url.searchParams.set("mode", "walking");
+    url.searchParams.set("mode", mode);
     url.searchParams.set("timeIs", "arriving");
     url.searchParams.set("time", arriveBy);
     url.searchParams.set("date", journeyDate);
     url.searchParams.set("journeyPreference", "leasttime");
+    if (useMultiModalCall) url.searchParams.set("useMultiModalCall", "true");
     if (tflKey) url.searchParams.set("app_key", tflKey);
-    const payload = await fetchJson(url);
-    return normaliseJourney(payload?.journeys?.[0]);
+    return fetchJson(url);
   });
+}
+
+async function tflJourneys(point) {
+  const payload = await tflRequest(point, PUBLIC_TRANSPORT_MODES, true);
+  const journeys = Array.isArray(payload?.journeys) ? payload.journeys : [];
+  const transitJourney = journeys
+    .filter(isPublicTransportJourney)
+    .sort((a, b) => Number(a?.duration || Infinity) - Number(b?.duration || Infinity))[0];
+  let walkingJourney = journeys
+    .filter(isWalkingJourney)
+    .sort((a, b) => Number(a?.duration || Infinity) - Number(b?.duration || Infinity))[0];
+
+  if (!walkingJourney) {
+    const walkingPayload = await tflRequest(point, "walking", false);
+    walkingJourney = Array.isArray(walkingPayload?.journeys) ? walkingPayload.journeys[0] : null;
+  }
+
+  return {
+    publicTransport: normaliseJourney(transitJourney),
+    walking: normaliseJourney(walkingJourney),
+  };
 }
 
 function decodeHtml(value) {
@@ -338,8 +371,8 @@ async function fetchLatestOnsRents() {
 
 function buildProfile(ward) {
   return {
-    summary: `${ward.name} is an official electoral ward in ${ward.borough}. Commute is measured from the ward reference point, reported crime uses a one-mile radius, and rent uses the latest available ONS borough-level average for the selected bedroom count.`,
-    tags: [ward.borough, "Official ward"],
+    summary: `${ward.name} is an official electoral area in ${ward.borough}. Commute is measured from the area reference point, reported crime uses a one-mile radius, and rent uses the latest available ONS borough-level average for the selected bedroom count.`,
+    tags: [ward.borough, "Official area boundary"],
     source: "GLA ward geography + ONS + Police.uk + TfL",
   };
 }
@@ -359,7 +392,7 @@ async function mapLimit(items, limit, worker) {
 }
 
 async function main() {
-  console.log(`Syncing every London ward → ${destinationPostcode} · arrive by ${arriveBy} · weekday ${journeyDate}`);
+  console.log(`Syncing every London area → ${destinationPostcode} · arrive by ${arriveBy} · weekday ${journeyDate}`);
   console.log(tflKey
     ? "TfL registered-key mode enabled."
     : "TfL anonymous mode enabled; requests are throttled below the anonymous 50/minute limit.");
@@ -372,14 +405,14 @@ async function main() {
 
   const wardRows = (wards.features || []).map((feature, index) => {
     const properties = feature.properties || {};
-    const name = prop(properties, ["ward_name", "WARD_NAME"], `Ward ${index + 1}`);
+    const name = prop(properties, ["ward_name", "WARD_NAME"], `Area ${index + 1}`);
     const code = prop(properties, ["ward_code", "WARD_CODE"], slug(name));
     const borough = prop(properties, ["la_name", "LA_NAME"], "London");
     const point = referencePoint(feature.geometry);
     return { code, name, borough, point };
   }).filter((ward) => ward.point && Number.isFinite(ward.point.lat) && Number.isFinite(ward.point.lng));
 
-  console.log(`${wardRows.length} official wards loaded · Police month ${policeMonth || "latest"}`);
+  console.log(`${wardRows.length} official London areas loaded · Police month ${policeMonth || "latest"}`);
 
   const synced = await mapLimit(wardRows, concurrency, async (ward, index) => {
     const prefix = `[${index + 1}/${wardRows.length}] ${ward.name}`;
@@ -394,10 +427,9 @@ async function main() {
     }
 
     try {
-      [publicTransport, walking] = await Promise.all([
-        tflJourney(ward.point, "publicTransport"),
-        tflJourney(ward.point, "walking"),
-      ]);
+      const commute = await tflJourneys(ward.point);
+      publicTransport = commute.publicTransport;
+      walking = commute.walking;
     } catch (error) {
       console.warn(`${prefix} · commute failed · ${error.message}`);
     }
@@ -413,7 +445,7 @@ async function main() {
       wardCode: ward.code,
       name: ward.name,
       borough: ward.borough,
-      referencePoint: { name: `${ward.name} ward reference point`, ...ward.point },
+      referencePoint: { name: `${ward.name} area reference point`, ...ward.point },
       destinationPostcode,
       arriveBy,
       journeyDate,
@@ -425,7 +457,7 @@ async function main() {
       sources: {
         geography: "Greater London Authority · London Wards (2022)",
         crime: crime ? "data.police.uk" : null,
-        commute: publicTransport || walking ? "Transport for London Journey Planner API" : null,
+        commute: publicTransport || walking ? "Powered by the Transport for London Journey Planner API" : null,
         rent: rentByBedroom ? "ONS Price Index of Private Rents · local authority by property size" : null,
         profile: profile.source,
       },
@@ -445,7 +477,7 @@ async function main() {
   }, null, 2)}\n`, "utf8");
 
   console.log(`Wrote ${outputPath}`);
-  console.log(`${synced.filter((item) => item.complete).length}/${synced.length} wards have commute, crime and rent.`);
+  console.log(`${synced.filter((item) => item.complete).length}/${synced.length} areas have commute, crime and rent.`);
 }
 
 main().catch((error) => {
