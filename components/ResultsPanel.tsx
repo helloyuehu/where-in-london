@@ -7,7 +7,9 @@ type Props = {
   results: MatchResult[];
   selectedId: string | null;
   onSelect: (id: string) => void;
-  dataMode: "demo" | "generated";
+  isLoading: boolean;
+  readyCount: number;
+  generatedAt: string | null;
 };
 
 function routeLabel(leg: RouteLeg) {
@@ -16,41 +18,51 @@ function routeLabel(leg: RouteLeg) {
 }
 
 function money(value: number | null) {
-  return value === null ? "No data" : `£${value.toLocaleString("en-GB")}`;
-}
-
-function resultState(result: MatchResult) {
-  if (result.allMatch) return "match";
-  if (result.failedCriteria.length === 1) return "near";
-  return "fail";
+  return value === null ? "Pending" : `£${value.toLocaleString("en-GB")}`;
 }
 
 function statusLabel(result: MatchResult) {
-  if (result.allMatch) return "Matches all";
-  if (result.failedCriteria.length === 1) return `Misses ${result.failedCriteria[0]}`;
-  return `Misses ${result.failedCriteria.length} criteria`;
+  if (result.state === "match") return "Matches all";
+  if (result.state === "near") return `Misses ${result.failedCriteria[0]}`;
+  if (result.state === "fail") return `Misses ${result.failedCriteria.length} criteria`;
+  return `Waiting for ${result.missingCriteria.join(", ") || "data"}`;
 }
 
-export function ResultsPanel({ filters, results, selectedId, onSelect, dataMode }: Props) {
-  const matches = results.filter((result) => result.allMatch);
-  const nearMatches = results.filter((result) => !result.allMatch && result.failedCriteria.length === 1);
-  const nonMatches = results.filter((result) => result.failedCriteria.length >= 2);
+function updatedLabel(value: string | null) {
+  if (!value) return null;
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return null;
+  return new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric" }).format(date);
+}
+
+export function ResultsPanel({
+  filters,
+  results,
+  selectedId,
+  onSelect,
+  isLoading,
+  readyCount,
+  generatedAt,
+}: Props) {
+  const matches = results.filter((result) => result.state === "match");
+  const nearMatches = results.filter((result) => result.state === "near");
+  const nonMatches = results.filter((result) => result.state === "fail");
+  const pending = results.filter((result) => result.state === "pending");
+  const refreshed = updatedLabel(generatedAt);
 
   return (
     <aside className="resultsPanel">
       <div className="resultsHeader">
         <div>
           <p className="eyebrow">London rental fit</p>
-          <h1>{matches.length} match</h1>
+          <h1>{isLoading ? "Loading London…" : `${matches.length} match`}</h1>
           <p className="coverageCopy">
-            {dataMode === "generated"
-              ? `${results.length} London wards evaluated`
-              : `${results.length} demo areas evaluated · all London wards shown on map`}
+            {results.length > 0
+              ? `${results.length} official wards · ${readyCount} fully evaluated${pending.length ? ` · ${pending.length} awaiting data` : ""}`
+              : "Loading official GLA ward geography and metrics…"}
           </p>
         </div>
-        <span className={`demoBadge ${dataMode === "generated" ? "live" : ""}`}>
-          {dataMode === "generated" ? "Ward data" : "V1 · fixture metrics"}
-        </span>
+        <span className="demoBadge live">Official wards</span>
       </div>
 
       <div className="summaryChips" aria-label="Active filters">
@@ -59,6 +71,7 @@ export function ResultsPanel({ filters, results, selectedId, onSelect, dataMode 
         <span>£{filters.rentMin.toLocaleString("en-GB")}–£{filters.rentMax.toLocaleString("en-GB")}</span>
         <span>{String(filters.bedroom) === "studio" ? "Studio" : `${filters.bedroom} bed`}</span>
         <span>≤ {filters.maxCrime === 9999 ? "Any" : filters.maxCrime} crimes / month</span>
+        {refreshed && <span>Metrics updated {refreshed}</span>}
       </div>
 
       <div className="resultsList">
@@ -70,7 +83,7 @@ export function ResultsPanel({ filters, results, selectedId, onSelect, dataMode 
           onSelect={onSelect}
         />
 
-        {matches.length === 0 && (
+        {!isLoading && matches.length === 0 && results.length > 0 && pending.length === 0 && (
           <div className="emptyState">
             <strong>No exact matches</strong>
             <p>Try widening one constraint. Almost matches are shown below.</p>
@@ -90,6 +103,15 @@ export function ResultsPanel({ filters, results, selectedId, onSelect, dataMode 
           title="Doesn’t match"
           detail="Misses two or more criteria"
           results={nonMatches}
+          selectedId={selectedId}
+          onSelect={onSelect}
+          compact
+        />
+
+        <ResultSection
+          title="Data pending"
+          detail="Official ward is shown; one or more metrics are still unavailable"
+          results={pending}
           selectedId={selectedId}
           onSelect={onSelect}
           compact
@@ -135,6 +157,28 @@ function ResultSection({
   );
 }
 
+function Metric({
+  label,
+  passes,
+  value,
+  detail,
+}: {
+  label: string;
+  passes: boolean | null;
+  value: string;
+  detail: string;
+}) {
+  const state = passes === null ? "pending" : passes ? "pass" : "fail";
+  const marker = passes === null ? "…" : passes ? "✓" : "✕";
+  return (
+    <div className={`metric ${state}`}>
+      <span>{marker} {label}</span>
+      <strong>{value}</strong>
+      <small>{detail}</small>
+    </div>
+  );
+}
+
 function AreaCard({
   result,
   selected,
@@ -148,42 +192,46 @@ function AreaCard({
 }) {
   const { area } = result;
   const transit = area.commute.publicTransport;
-  const route = transit.legs?.map(routeLabel).join(" → ");
-  const state = resultState(result);
+  const walking = area.commute.walking;
+  const route = transit?.legs?.map(routeLabel).join(" → ");
+  const crime = area.crime;
 
   return (
-    <button type="button" onClick={onSelect} className={`areaCard ${state} ${selected ? "selected" : ""}`}>
+    <button type="button" onClick={onSelect} className={`areaCard ${result.state} ${selected ? "selected" : ""}`}>
       <div className="cardTopline">
         <div>
           <h2>{area.name}</h2>
-          <p>{area.borough}</p>
+          <p>{area.borough} · Ward</p>
         </div>
-        <span className={`matchPill ${state}`}>{statusLabel(result)}</span>
+        <span className={`matchPill ${result.state}`}>{statusLabel(result)}</span>
       </div>
 
       {!compact && <p className="areaSummary">{area.profile.summary}</p>}
 
       <div className="metricGrid">
-        <div className={`metric ${result.commuteMatches ? "pass" : "fail"}`}>
-          <span>{result.commuteMatches ? "✓" : "✕"} Commute</span>
-          <strong>{transit.minutes} min</strong>
-          <small>transit · walk {area.commute.walking.minutes} min</small>
-        </div>
-        <div className={`metric ${result.rentMatches ? "pass" : "fail"}`}>
-          <span>{result.rentMatches ? "✓" : "✕"} Rent</span>
-          <strong>{money(result.rent)}</strong>
-          <small>/ month · selected bed</small>
-        </div>
-        <div className={`metric ${result.crimeMatches ? "pass" : "fail"}`}>
-          <span>{result.crimeMatches ? "✓" : "✕"} Reported crime</span>
-          <strong>{area.crime.total}</strong>
-          <small>{area.crime.month} · within {area.crime.radiusMiles} mile</small>
-        </div>
+        <Metric
+          label="Commute"
+          passes={result.commuteMatches}
+          value={transit ? `${transit.minutes} min` : "Pending"}
+          detail={transit ? `transit${walking ? ` · walk ${walking.minutes} min` : ""}` : "TfL Journey Planner"}
+        />
+        <Metric
+          label="Rent"
+          passes={result.rentMatches}
+          value={money(result.rent)}
+          detail={result.rent === null ? "ONS borough rent by bedroom" : `/ month · ${area.borough}`}
+        />
+        <Metric
+          label="Reported crime"
+          passes={result.crimeMatches}
+          value={crime ? String(crime.total) : "Pending"}
+          detail={crime ? `${crime.month} · within ${crime.radiusMiles} mile` : "Police.uk · one-mile radius"}
+        />
       </div>
 
       {!compact && route && <div className="routeLine"><span className="routeIcon">↳</span><span>{route}</span></div>}
 
-      {!compact && (
+      {!compact && area.profile.tags.length > 0 && (
         <div className="tagRow">
           {area.profile.tags.map((tag) => <span key={tag}>{tag}</span>)}
         </div>

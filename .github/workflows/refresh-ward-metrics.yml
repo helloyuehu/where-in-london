@@ -1,0 +1,53 @@
+name: Refresh London ward metrics
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "20 3 1 * *"
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/refresh-ward-metrics.yml"
+      - "scripts/sync-ward-metrics.mjs"
+      - "package.json"
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Refresh official London ward metrics
+        run: npm run sync:wards
+        env:
+          TFL_APP_KEY: ${{ secrets.TFL_APP_KEY }}
+          WORK_POSTCODE: W1D 3QW
+          ARRIVE_BY: "09:00"
+          SYNC_CONCURRENCY: "6"
+
+      - name: Validate production build
+        run: npm run build
+
+      - name: Commit refreshed data
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add package-lock.json lib/data/ward-metrics.generated.json data/ons-rents-by-borough.json
+          if git diff --cached --quiet; then
+            echo "No metric changes to commit."
+          else
+            git commit -m "Refresh official London ward metrics"
+            git push
+          fi

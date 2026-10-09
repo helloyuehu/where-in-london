@@ -4,7 +4,6 @@ import { useEffect, useMemo, useState } from "react";
 import { FilterBar } from "@/components/FilterBar";
 import { LondonMap } from "@/components/LondonMap";
 import { ResultsPanel } from "@/components/ResultsPanel";
-import { londonAreas } from "@/lib/data/areas";
 import { evaluateArea, rankResults } from "@/lib/filter";
 import type { FilterState, LondonArea } from "@/lib/types";
 
@@ -19,29 +18,70 @@ const initialFilters: FilterState = {
   maxCrime: 99,
 };
 
+type AreasPayload = {
+  areas?: LondonArea[];
+  generatedAt?: string | null;
+  metricsDestinationPostcode?: string | null;
+};
+
+function normalisePostcode(value: string) {
+  return value.replace(/\s+/g, "").toUpperCase();
+}
+
 export default function Home() {
   const [filters, setFilters] = useState<FilterState>(initialFilters);
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [areas, setAreas] = useState<LondonArea[]>(londonAreas);
-  const [dataMode, setDataMode] = useState<"demo" | "generated">("demo");
+  const [areas, setAreas] = useState<LondonArea[]>([]);
+  const [isLoadingAreas, setIsLoadingAreas] = useState(true);
+  const [metricsDestinationPostcode, setMetricsDestinationPostcode] = useState<string | null>(null);
+  const [generatedAt, setGeneratedAt] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
-    fetch("/api/ward-metrics", { cache: "no-store" })
-      .then((response) => response.json())
-      .then((payload) => {
-        if (cancelled || !Array.isArray(payload?.areas) || payload.areas.length === 0) return;
-        setAreas(payload.areas as LondonArea[]);
-        setDataMode("generated");
+    setIsLoadingAreas(true);
+
+    fetch("/api/areas", { cache: "no-store" })
+      .then((response) => {
+        if (!response.ok) throw new Error("London ward data unavailable");
+        return response.json() as Promise<AreasPayload>;
       })
-      .catch(() => undefined);
+      .then((payload) => {
+        if (cancelled) return;
+        setAreas(Array.isArray(payload.areas) ? payload.areas : []);
+        setMetricsDestinationPostcode(payload.metricsDestinationPostcode || null);
+        setGeneratedAt(payload.generatedAt || null);
+      })
+      .catch(() => {
+        if (!cancelled) setAreas([]);
+      })
+      .finally(() => {
+        if (!cancelled) setIsLoadingAreas(false);
+      });
+
     return () => { cancelled = true; };
   }, []);
 
+  const effectiveAreas = useMemo(() => {
+    const destinationChanged = Boolean(
+      metricsDestinationPostcode
+      && normalisePostcode(metricsDestinationPostcode) !== normalisePostcode(filters.destinationPostcode),
+    );
+
+    if (!destinationChanged) return areas;
+
+    return areas.map((area) => ({
+      ...area,
+      commute: { publicTransport: null, walking: null },
+      dataStatus: area.dataStatus === "ready" ? "partial" as const : area.dataStatus,
+    }));
+  }, [areas, filters.destinationPostcode, metricsDestinationPostcode]);
+
   const results = useMemo(
-    () => rankResults(areas.map((area) => evaluateArea(area, filters))),
-    [areas, filters],
+    () => rankResults(effectiveAreas.map((area) => evaluateArea(area, filters))),
+    [effectiveAreas, filters],
   );
+
+  const readyCount = effectiveAreas.filter((area) => area.dataStatus === "ready").length;
 
   return (
     <main className="appFrame">
@@ -53,7 +93,9 @@ export default function Home() {
             <span>Constraint-based area explorer</span>
           </div>
         </div>
-        <div className="methodNote">Facts first · no combined score</div>
+        <div className="methodNote">
+          {areas.length ? `${areas.length} London wards` : "All London wards"} · official geography · no combined score
+        </div>
       </header>
 
       <FilterBar filters={filters} onChange={setFilters} />
@@ -70,7 +112,9 @@ export default function Home() {
           results={results}
           selectedId={selectedId}
           onSelect={setSelectedId}
-          dataMode={dataMode}
+          isLoading={isLoadingAreas}
+          readyCount={readyCount}
+          generatedAt={generatedAt}
         />
       </div>
     </main>
