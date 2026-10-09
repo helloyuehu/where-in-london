@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-09T15:12:44.432Z",
+  "generatedAt": "2026-10-09T15:26:53.702Z",
   "destinationPostcode": "W1D 3QW",
   "arriveBy": "0900",
   "journeyDate": "20261013",
@@ -30,7 +30,12 @@
         "radiusMiles": 1,
         "source": "data.police.uk"
       },
-      "rentByBedroom": null,
+      "rentByBedroom": {
+        "1": 1377,
+        "2": 1721,
+        "3": 1899,
+        "4+": 2519
+      },
       "profile": {
         "summary": "Barking Riverside is an official electoral area in Barking and Dagenham. Commute is measured from the area reference point, reported crime uses a one-mile radius, and rent uses the latest available ONS borough-level average for the selected bedroom count.",
         "tags": [
@@ -44,7 +49,7 @@
         "geography": "Greater London Authority · London Wards (2022)",
         "crime": "data.police.uk",
         "commute": null,
-        "rent": null,
+        "rent": "ONS Price Index of Private Rents · local authority by property size",
         "profile": "GLA ward geography + ONS + Police.uk + TfL"
       }
     },
@@ -71,7 +76,12 @@
         "radiusMiles": 1,
         "source": "data.police.uk"
       },
-      "rentByBedroom": null,
+      "rentByBedroom": {
+        "1": 1500,
+        "2": 1858,
+        "3": 2256,
+        "4+": 3192
+      },
       "profile": {
         "summary": "High Barnet is an official electoral area in Barnet. Commute is measured from the area reference point, reported crime uses a one-mile radius, and rent uses the latest available ONS borough-level average for the selected bedroom count.",
         "tags": [
@@ -85,7 +95,7 @@
         "geography": "Greater London Authority · London Wards (2022)",
         "crime": "data.police.uk",
         "commute": null,
-        "rent": null,
+        "rent": "ONS Price Index of Private Rents · local authority by property size",
         "profile": "GLA ward geography + ONS + Police.uk + TfL"
       }
     },
@@ -112,7 +122,12 @@
         "radiusMiles": 1,
         "source": "data.police.uk"
       },
-      "rentByBedroom": null,
+      "rentByBedroom": {
+        "1": 1229,
+        "2": 1526,
+        "3": 1865,
+        "4+": 2424
+      },
       "profile": {
         "summary": "Sidcup is an official electoral area in Bexley. Commute is measured from the area reference point, reported crime uses a one-mile radius, and rent uses the latest available ONS borough-level average for the selected bedroom count.",
         "tags": [
@@ -126,7 +141,7 @@
         "geography": "Greater London Authority · London Wards (2022)",
         "crime": "data.police.uk",
         "commute": null,
-        "rent": null,
+        "rent": "ONS Price Index of Private Rents · local authority by property size",
         "profile": "GLA ward geography + ONS + Police.uk + TfL"
       }
     },
@@ -153,7 +168,12 @@
         "radiusMiles": 1,
         "source": "data.police.uk"
       },
-      "rentByBedroom": null,
+      "rentByBedroom": {
+        "1": 1577,
+        "2": 1934,
+        "3": 2271,
+        "4+": 3052
+      },
       "profile": {
         "summary": "Wembley is an official electoral area in Brent. Commute is measured from the area reference point, reported crime uses a one-mile radius, and rent uses the latest available ONS borough-level average for the selected bedroom count.",
         "tags": [
@@ -167,7 +187,7 @@
         "geography": "Greater London Authority · London Wards (2022)",
         "crime": "data.police.uk",
         "commute": null,
-        "rent": null,
+        "rent": "ONS Price Index of Private Rents · local authority by property size",
         "profile": "GLA ward geography + ONS + Police.uk + TfL"
       }
     },
@@ -194,7 +214,12 @@
         "radiusMiles": 1,
         "source": "data.police.uk"
       },
-      "rentByBedroom": null,
+      "rentByBedroom": {
+        "1": 1312,
+        "2": 1641,
+        "3": 1990,
+        "4+": 2926
+      },
       "profile": {
         "summary": "Bromley is an official electoral area in Bromley. Commute is measured from the area reference point, reported crime uses a one-mile radius, and rent uses the latest available ONS borough-level average for the selected bedroom count.",
         "tags": [
@@ -208,7 +233,7 @@
         "geography": "Greater London Authority · London Wards (2022)",
         "crime": "data.police.uk",
         "commute": null,
-        "rent": null,
+        "rent": "ONS Price Index of Private Rents · local authority by property size",
         "profile": "GLA ward geography + ONS + Police.uk + TfL"
       }
     },
@@ -235,7 +260,12 @@
         "radiusMiles": 1,
         "source": "data.police.uk"
       },
-      "rentByBedroom": null,
+      "rentByBedroom": {
+        "1": 2054,
+        "2": 2621,
+        "3": 3055,
+        "4+": 3967
+      },
       "profile": {
         "summary": "Camden Town is an official electoral area in Camden. Commute is measured from the area reference point, reported crime uses a one-mile radius, and rent uses the latest available ONS borough-level average for the selected bedroom count.",
         "tags": [
@@ -249,7 +279,7 @@
         "geography": "Greater London Authority · London Wards (2022)",
         "crime": "data.police.uk",
         "commute": null,
-        "rent": null,
+        "rent": "ONS Price Index of Private Rents · local authority by property size",
         "profile": "GLA ward geography + ONS + Police.uk + TfL"
       }
     },
@@ -317,7 +347,12 @@
         "radiusMiles": 1,
         "source": "data.police.uk"
       },
-      "rentByBedroom": null,
+      "rentByBedroom": {
+        "1": 1265,
+        "2": 1573,
+        "3": 1858,
+        "4+": 2667
+      },
       "profile": {
         "summary": "Croydon Central is an official electoral area in Croydon. Commute is measured from the area reference point, reported crime uses a one-mile radius, and rent uses the latest available ONS borough-level average for the selected bedroom count.",
         "tags": [
@@ -331,7 +366,7 @@
         "geography": "Greater London Authority · London Wards (2022)",
         "crime": "data.police.uk",
         "commute": null,
-        "rent": null,
+        "rent": "ONS Price Index of Private Rents · local authority by property size",
         "profile": "GLA ward geography + ONS + Police.uk + TfL"
       }
     },
@@ -358,7 +393,12 @@
         "radiusMiles": 1,
         "source": "data.police.uk"
       },
-      "rentByBedroom": null,
+      "rentByBedroom": {
+        "1": 1629,
+        "2": 2033,
+        "3": 2406,
+        "4+": 3287
+      },
       "profile": {
         "summary": "Ealing Broadway is an official electoral area in Ealing. Commute is measured from the area reference point, reported crime uses a one-mile radius, and rent uses the latest available ONS borough-level average for the selected bedroom count.",
         "tags": [
@@ -372,7 +412,7 @@
         "geography": "Greater London Authority · London Wards (2022)",
         "crime": "data.police.uk",
         "commute": null,
-        "rent": null,
+        "rent": "ONS Price Index of Private Rents · local authority by property size",
         "profile": "GLA ward geography + ONS + Police.uk + TfL"
       }
     },
@@ -399,7 +439,12 @@
         "radiusMiles": 1,
         "source": "data.police.uk"
       },
-      "rentByBedroom": null,
+      "rentByBedroom": {
+        "1": 1422,
+        "2": 1764,
+        "3": 2098,
+        "4+": 2807
+      },
       "profile": {
         "summary": "Palmers Green is an official electoral area in Enfield. Commute is measured from the area reference point, reported crime uses a one-mile radius, and rent uses the latest available ONS borough-level average for the selected bedroom count.",
         "tags": [
@@ -413,7 +458,7 @@
         "geography": "Greater London Authority · London Wards (2022)",
         "crime": "data.police.uk",
         "commute": null,
-        "rent": null,
+        "rent": "ONS Price Index of Private Rents · local authority by property size",
         "profile": "GLA ward geography + ONS + Police.uk + TfL"
       }
     },
@@ -440,7 +485,12 @@
         "radiusMiles": 1,
         "source": "data.police.uk"
       },
-      "rentByBedroom": null,
+      "rentByBedroom": {
+        "1": 1563,
+        "2": 1932,
+        "3": 2242,
+        "4+": 3001
+      },
       "profile": {
         "summary": "Greenwich is an official electoral area in Greenwich. Commute is measured from the area reference point, reported crime uses a one-mile radius, and rent uses the latest available ONS borough-level average for the selected bedroom count.",
         "tags": [
@@ -454,7 +504,7 @@
         "geography": "Greater London Authority · London Wards (2022)",
         "crime": "data.police.uk",
         "commute": null,
-        "rent": null,
+        "rent": "ONS Price Index of Private Rents · local authority by property size",
         "profile": "GLA ward geography + ONS + Police.uk + TfL"
       }
     },
@@ -481,7 +531,12 @@
         "radiusMiles": 1,
         "source": "data.police.uk"
       },
-      "rentByBedroom": null,
+      "rentByBedroom": {
+        "1": 2001,
+        "2": 2489,
+        "3": 2846,
+        "4+": 3674
+      },
       "profile": {
         "summary": "Hackney Central is an official electoral area in Hackney. Commute is measured from the area reference point, reported crime uses a one-mile radius, and rent uses the latest available ONS borough-level average for the selected bedroom count.",
         "tags": [
@@ -495,7 +550,7 @@
         "geography": "Greater London Authority · London Wards (2022)",
         "crime": "data.police.uk",
         "commute": null,
-        "rent": null,
+        "rent": "ONS Price Index of Private Rents · local authority by property size",
         "profile": "GLA ward geography + ONS + Police.uk + TfL"
       }
     },
@@ -522,7 +577,12 @@
         "radiusMiles": 1,
         "source": "data.police.uk"
       },
-      "rentByBedroom": null,
+      "rentByBedroom": {
+        "1": 2000,
+        "2": 2622,
+        "3": 2992,
+        "4+": 4181
+      },
       "profile": {
         "summary": "Hammersmith is an official electoral area in Hammersmith and Fulham. Commute is measured from the area reference point, reported crime uses a one-mile radius, and rent uses the latest available ONS borough-level average for the selected bedroom count.",
         "tags": [
@@ -536,7 +596,7 @@
         "geography": "Greater London Authority · London Wards (2022)",
         "crime": "data.police.uk",
         "commute": null,
-        "rent": null,
+        "rent": "ONS Price Index of Private Rents · local authority by property size",
         "profile": "GLA ward geography + ONS + Police.uk + TfL"
       }
     },
@@ -563,7 +623,12 @@
         "radiusMiles": 1,
         "source": "data.police.uk"
       },
-      "rentByBedroom": null,
+      "rentByBedroom": {
+        "1": 1639,
+        "2": 2034,
+        "3": 2356,
+        "4+": 3186
+      },
       "profile": {
         "summary": "Crouch End is an official electoral area in Haringey. Commute is measured from the area reference point, reported crime uses a one-mile radius, and rent uses the latest available ONS borough-level average for the selected bedroom count.",
         "tags": [
@@ -577,7 +642,7 @@
         "geography": "Greater London Authority · London Wards (2022)",
         "crime": "data.police.uk",
         "commute": null,
-        "rent": null,
+        "rent": "ONS Price Index of Private Rents · local authority by property size",
         "profile": "GLA ward geography + ONS + Police.uk + TfL"
       }
     },
@@ -604,7 +669,12 @@
         "radiusMiles": 1,
         "source": "data.police.uk"
       },
-      "rentByBedroom": null,
+      "rentByBedroom": {
+        "1": 1394,
+        "2": 1715,
+        "3": 2064,
+        "4+": 2789
+      },
       "profile": {
         "summary": "Harrow on the Hill is an official electoral area in Harrow. Commute is measured from the area reference point, reported crime uses a one-mile radius, and rent uses the latest available ONS borough-level average for the selected bedroom count.",
         "tags": [
@@ -618,7 +688,7 @@
         "geography": "Greater London Authority · London Wards (2022)",
         "crime": "data.police.uk",
         "commute": null,
-        "rent": null,
+        "rent": "ONS Price Index of Private Rents · local authority by property size",
         "profile": "GLA ward geography + ONS + Police.uk + TfL"
       }
     },
@@ -645,7 +715,12 @@
         "radiusMiles": 1,
         "source": "data.police.uk"
       },
-      "rentByBedroom": null,
+      "rentByBedroom": {
+        "1": 1217,
+        "2": 1542,
+        "3": 1847,
+        "4+": 2496
+      },
       "profile": {
         "summary": "Hylands & Harrow Lodge is an official electoral area in Havering. Commute is measured from the area reference point, reported crime uses a one-mile radius, and rent uses the latest available ONS borough-level average for the selected bedroom count.",
         "tags": [
@@ -659,7 +734,7 @@
         "geography": "Greater London Authority · London Wards (2022)",
         "crime": "data.police.uk",
         "commute": null,
-        "rent": null,
+        "rent": "ONS Price Index of Private Rents · local authority by property size",
         "profile": "GLA ward geography + ONS + Police.uk + TfL"
       }
     },
@@ -686,7 +761,12 @@
         "radiusMiles": 1,
         "source": "data.police.uk"
       },
-      "rentByBedroom": null,
+      "rentByBedroom": {
+        "1": 1252,
+        "2": 1586,
+        "3": 1913,
+        "4+": 2634
+      },
       "profile": {
         "summary": "Uxbridge is an official electoral area in Hillingdon. Commute is measured from the area reference point, reported crime uses a one-mile radius, and rent uses the latest available ONS borough-level average for the selected bedroom count.",
         "tags": [
@@ -700,7 +780,7 @@
         "geography": "Greater London Authority · London Wards (2022)",
         "crime": "data.police.uk",
         "commute": null,
-        "rent": null,
+        "rent": "ONS Price Index of Private Rents · local authority by property size",
         "profile": "GLA ward geography + ONS + Police.uk + TfL"
       }
     },
@@ -727,7 +807,12 @@
         "radiusMiles": 1,
         "source": "data.police.uk"
       },
-      "rentByBedroom": null,
+      "rentByBedroom": {
+        "1": 1583,
+        "2": 1947,
+        "3": 2241,
+        "4+": 3076
+      },
       "profile": {
         "summary": "Chiswick is an official electoral area in Hounslow. Commute is measured from the area reference point, reported crime uses a one-mile radius, and rent uses the latest available ONS borough-level average for the selected bedroom count.",
         "tags": [
@@ -741,7 +826,7 @@
         "geography": "Greater London Authority · London Wards (2022)",
         "crime": "data.police.uk",
         "commute": null,
-        "rent": null,
+        "rent": "ONS Price Index of Private Rents · local authority by property size",
         "profile": "GLA ward geography + ONS + Police.uk + TfL"
       }
     },
@@ -768,7 +853,12 @@
         "radiusMiles": 1,
         "source": "data.police.uk"
       },
-      "rentByBedroom": null,
+      "rentByBedroom": {
+        "1": 2178,
+        "2": 2697,
+        "3": 3005,
+        "4+": 4229
+      },
       "profile": {
         "summary": "Laycock is an official electoral area in Islington. Commute is measured from the area reference point, reported crime uses a one-mile radius, and rent uses the latest available ONS borough-level average for the selected bedroom count.",
         "tags": [
@@ -782,7 +872,7 @@
         "geography": "Greater London Authority · London Wards (2022)",
         "crime": "data.police.uk",
         "commute": null,
-        "rent": null,
+        "rent": "ONS Price Index of Private Rents · local authority by property size",
         "profile": "GLA ward geography + ONS + Police.uk + TfL"
       }
     },
@@ -809,7 +899,12 @@
         "radiusMiles": 1,
         "source": "data.police.uk"
       },
-      "rentByBedroom": null,
+      "rentByBedroom": {
+        "1": 2640,
+        "2": 3428,
+        "3": 4074,
+        "4+": 5650
+      },
       "profile": {
         "summary": "Notting Hill is an official electoral area in Kensington and Chelsea. Commute is measured from the area reference point, reported crime uses a one-mile radius, and rent uses the latest available ONS borough-level average for the selected bedroom count.",
         "tags": [
@@ -823,7 +918,7 @@
         "geography": "Greater London Authority · London Wards (2022)",
         "crime": "data.police.uk",
         "commute": null,
-        "rent": null,
+        "rent": "ONS Price Index of Private Rents · local authority by property size",
         "profile": "GLA ward geography + ONS + Police.uk + TfL"
       }
     },
@@ -850,7 +945,12 @@
         "radiusMiles": 1,
         "source": "data.police.uk"
       },
-      "rentByBedroom": null,
+      "rentByBedroom": {
+        "1": 1379,
+        "2": 1755,
+        "3": 2154,
+        "4+": 2836
+      },
       "profile": {
         "summary": "Kingston is an official electoral area in Kingston upon Thames. Commute is measured from the area reference point, reported crime uses a one-mile radius, and rent uses the latest available ONS borough-level average for the selected bedroom count.",
         "tags": [
@@ -864,7 +964,7 @@
         "geography": "Greater London Authority · London Wards (2022)",
         "crime": "data.police.uk",
         "commute": null,
-        "rent": null,
+        "rent": "ONS Price Index of Private Rents · local authority by property size",
         "profile": "GLA ward geography + ONS + Police.uk + TfL"
       }
     },
@@ -891,7 +991,12 @@
         "radiusMiles": 1,
         "source": "data.police.uk"
       },
-      "rentByBedroom": null,
+      "rentByBedroom": {
+        "1": 1882,
+        "2": 2342,
+        "3": 2682,
+        "4+": 3715
+      },
       "profile": {
         "summary": "Brixton is an official electoral area in Lambeth. Commute is measured from the area reference point, reported crime uses a one-mile radius, and rent uses the latest available ONS borough-level average for the selected bedroom count.",
         "tags": [
@@ -905,7 +1010,7 @@
         "geography": "Greater London Authority · London Wards (2022)",
         "crime": "data.police.uk",
         "commute": null,
-        "rent": null,
+        "rent": "ONS Price Index of Private Rents · local authority by property size",
         "profile": "GLA ward geography + ONS + Police.uk + TfL"
       }
     },
@@ -932,7 +1037,12 @@
         "radiusMiles": 1,
         "source": "data.police.uk"
       },
-      "rentByBedroom": null,
+      "rentByBedroom": {
+        "1": 1457,
+        "2": 1789,
+        "3": 2057,
+        "4+": 2714
+      },
       "profile": {
         "summary": "Brockley is an official electoral area in Lewisham. Commute is measured from the area reference point, reported crime uses a one-mile radius, and rent uses the latest available ONS borough-level average for the selected bedroom count.",
         "tags": [
@@ -946,7 +1056,7 @@
         "geography": "Greater London Authority · London Wards (2022)",
         "crime": "data.police.uk",
         "commute": null,
-        "rent": null,
+        "rent": "ONS Price Index of Private Rents · local authority by property size",
         "profile": "GLA ward geography + ONS + Police.uk + TfL"
       }
     },
@@ -973,7 +1083,12 @@
         "radiusMiles": 1,
         "source": "data.police.uk"
       },
-      "rentByBedroom": null,
+      "rentByBedroom": {
+        "1": 1639,
+        "2": 2024,
+        "3": 2407,
+        "4+": 3267
+      },
       "profile": {
         "summary": "Wimbledon is an official electoral area in Merton. Commute is measured from the area reference point, reported crime uses a one-mile radius, and rent uses the latest available ONS borough-level average for the selected bedroom count.",
         "tags": [
@@ -987,7 +1102,7 @@
         "geography": "Greater London Authority · London Wards (2022)",
         "crime": "data.police.uk",
         "commute": null,
-        "rent": null,
+        "rent": "ONS Price Index of Private Rents · local authority by property size",
         "profile": "GLA ward geography + ONS + Police.uk + TfL"
       }
     },
@@ -1014,7 +1129,12 @@
         "radiusMiles": 1,
         "source": "data.police.uk"
       },
-      "rentByBedroom": null,
+      "rentByBedroom": {
+        "1": 1630,
+        "2": 1993,
+        "3": 2212,
+        "4+": 2672
+      },
       "profile": {
         "summary": "Stratford is an official electoral area in Newham. Commute is measured from the area reference point, reported crime uses a one-mile radius, and rent uses the latest available ONS borough-level average for the selected bedroom count.",
         "tags": [
@@ -1028,7 +1148,7 @@
         "geography": "Greater London Authority · London Wards (2022)",
         "crime": "data.police.uk",
         "commute": null,
-        "rent": null,
+        "rent": "ONS Price Index of Private Rents · local authority by property size",
         "profile": "GLA ward geography + ONS + Police.uk + TfL"
       }
     },
@@ -1055,7 +1175,12 @@
         "radiusMiles": 1,
         "source": "data.police.uk"
       },
-      "rentByBedroom": null,
+      "rentByBedroom": {
+        "1": 1368,
+        "2": 1681,
+        "3": 1981,
+        "4+": 2711
+      },
       "profile": {
         "summary": "Wanstead is an official electoral area in Redbridge. Commute is measured from the area reference point, reported crime uses a one-mile radius, and rent uses the latest available ONS borough-level average for the selected bedroom count.",
         "tags": [
@@ -1069,7 +1194,7 @@
         "geography": "Greater London Authority · London Wards (2022)",
         "crime": "data.police.uk",
         "commute": null,
-        "rent": null,
+        "rent": "ONS Price Index of Private Rents · local authority by property size",
         "profile": "GLA ward geography + ONS + Police.uk + TfL"
       }
     },
@@ -1096,7 +1221,12 @@
         "radiusMiles": 1,
         "source": "data.police.uk"
       },
-      "rentByBedroom": null,
+      "rentByBedroom": {
+        "1": 1732,
+        "2": 2222,
+        "3": 2684,
+        "4+": 3907
+      },
       "profile": {
         "summary": "Richmond is an official electoral area in Richmond upon Thames. Commute is measured from the area reference point, reported crime uses a one-mile radius, and rent uses the latest available ONS borough-level average for the selected bedroom count.",
         "tags": [
@@ -1110,7 +1240,7 @@
         "geography": "Greater London Authority · London Wards (2022)",
         "crime": "data.police.uk",
         "commute": null,
-        "rent": null,
+        "rent": "ONS Price Index of Private Rents · local authority by property size",
         "profile": "GLA ward geography + ONS + Police.uk + TfL"
       }
     },
@@ -1137,7 +1267,12 @@
         "radiusMiles": 1,
         "source": "data.police.uk"
       },
-      "rentByBedroom": null,
+      "rentByBedroom": {
+        "1": 1876,
+        "2": 2348,
+        "3": 2732,
+        "4+": 3608
+      },
       "profile": {
         "summary": "Borough & Bankside is an official electoral area in Southwark. Commute is measured from the area reference point, reported crime uses a one-mile radius, and rent uses the latest available ONS borough-level average for the selected bedroom count.",
         "tags": [
@@ -1151,7 +1286,7 @@
         "geography": "Greater London Authority · London Wards (2022)",
         "crime": "data.police.uk",
         "commute": null,
-        "rent": null,
+        "rent": "ONS Price Index of Private Rents · local authority by property size",
         "profile": "GLA ward geography + ONS + Police.uk + TfL"
       }
     },
@@ -1178,7 +1313,12 @@
         "radiusMiles": 1,
         "source": "data.police.uk"
       },
-      "rentByBedroom": null,
+      "rentByBedroom": {
+        "1": 1239,
+        "2": 1554,
+        "3": 1899,
+        "4+": 2492
+      },
       "profile": {
         "summary": "Sutton is an official electoral area in Sutton. Commute is measured from the area reference point, reported crime uses a one-mile radius, and rent uses the latest available ONS borough-level average for the selected bedroom count.",
         "tags": [
@@ -1192,7 +1332,7 @@
         "geography": "Greater London Authority · London Wards (2022)",
         "crime": "data.police.uk",
         "commute": null,
-        "rent": null,
+        "rent": "ONS Price Index of Private Rents · local authority by property size",
         "profile": "GLA ward geography + ONS + Police.uk + TfL"
       }
     },
@@ -1219,7 +1359,12 @@
         "radiusMiles": 1,
         "source": "data.police.uk"
       },
-      "rentByBedroom": null,
+      "rentByBedroom": {
+        "1": 1992,
+        "2": 2418,
+        "3": 2750,
+        "4+": 3378
+      },
       "profile": {
         "summary": "Canary Wharf is an official electoral area in Tower Hamlets. Commute is measured from the area reference point, reported crime uses a one-mile radius, and rent uses the latest available ONS borough-level average for the selected bedroom count.",
         "tags": [
@@ -1233,7 +1378,7 @@
         "geography": "Greater London Authority · London Wards (2022)",
         "crime": "data.police.uk",
         "commute": null,
-        "rent": null,
+        "rent": "ONS Price Index of Private Rents · local authority by property size",
         "profile": "GLA ward geography + ONS + Police.uk + TfL"
       }
     },
@@ -1260,7 +1405,12 @@
         "radiusMiles": 1,
         "source": "data.police.uk"
       },
-      "rentByBedroom": null,
+      "rentByBedroom": {
+        "1": 1400,
+        "2": 1723,
+        "3": 2023,
+        "4+": 2565
+      },
       "profile": {
         "summary": "Walthamstow is an official electoral area in Waltham Forest. Commute is measured from the area reference point, reported crime uses a one-mile radius, and rent uses the latest available ONS borough-level average for the selected bedroom count.",
         "tags": [
@@ -1274,7 +1424,7 @@
         "geography": "Greater London Authority · London Wards (2022)",
         "crime": "data.police.uk",
         "commute": null,
-        "rent": null,
+        "rent": "ONS Price Index of Private Rents · local authority by property size",
         "profile": "GLA ward geography + ONS + Police.uk + TfL"
       }
     },
@@ -1301,7 +1451,12 @@
         "radiusMiles": 1,
         "source": "data.police.uk"
       },
-      "rentByBedroom": null,
+      "rentByBedroom": {
+        "1": 1938,
+        "2": 2463,
+        "3": 2810,
+        "4+": 3818
+      },
       "profile": {
         "summary": "Battersea is an official electoral area in Wandsworth. Commute is measured from the area reference point, reported crime uses a one-mile radius, and rent uses the latest available ONS borough-level average for the selected bedroom count.",
         "tags": [
@@ -1315,7 +1470,7 @@
         "geography": "Greater London Authority · London Wards (2022)",
         "crime": "data.police.uk",
         "commute": null,
-        "rent": null,
+        "rent": "ONS Price Index of Private Rents · local authority by property size",
         "profile": "GLA ward geography + ONS + Police.uk + TfL"
       }
     },
@@ -1342,7 +1497,12 @@
         "radiusMiles": 1,
         "source": "data.police.uk"
       },
-      "rentByBedroom": null,
+      "rentByBedroom": {
+        "1": 2548,
+        "2": 3305,
+        "3": 3895,
+        "4+": 5424
+      },
       "profile": {
         "summary": "Soho & West End is an official electoral area in Westminster. Commute is measured from the area reference point, reported crime uses a one-mile radius, and rent uses the latest available ONS borough-level average for the selected bedroom count.",
         "tags": [
@@ -1356,376 +1516,7 @@
         "geography": "Greater London Authority · London Wards (2022)",
         "crime": "data.police.uk",
         "commute": null,
-        "rent": null,
-        "profile": "GLA ward geography + ONS + Police.uk + TfL"
-      }
-    },
-    {
-      "id": "E05013515",
-      "wardCode": "E05013515",
-      "name": "Wembley",
-      "borough": "Brent",
-      "referencePoint": {
-        "name": "Wembley area reference point",
-        "lng": -0.2919069575158013,
-        "lat": 51.55702009913471
-      },
-      "destinationPostcode": "W1D 3QW",
-      "arriveBy": "0900",
-      "journeyDate": "20261013",
-      "commute": {
-        "publicTransport": null,
-        "walking": null
-      },
-      "crime": {
-        "month": "2026-08",
-        "total": 781,
-        "radiusMiles": 1,
-        "source": "data.police.uk"
-      },
-      "rentByBedroom": null,
-      "profile": {
-        "summary": "Wembley is an official electoral area in Brent. Commute is measured from the area reference point, reported crime uses a one-mile radius, and rent uses the latest available ONS borough-level average for the selected bedroom count.",
-        "tags": [
-          "Brent",
-          "Official area boundary"
-        ],
-        "source": "GLA ward geography + ONS + Police.uk + TfL"
-      },
-      "complete": false,
-      "sources": {
-        "geography": "Greater London Authority · London Wards (2022)",
-        "crime": "data.police.uk",
-        "commute": null,
-        "rent": null,
-        "profile": "GLA ward geography + ONS + Police.uk + TfL"
-      }
-    },
-    {
-      "id": "E05013991",
-      "wardCode": "E05013991",
-      "name": "Bromley",
-      "borough": "Bromley",
-      "referencePoint": {
-        "name": "Bromley area reference point",
-        "lng": 0.01764335852112538,
-        "lat": 51.40030366749874
-      },
-      "destinationPostcode": "W1D 3QW",
-      "arriveBy": "0900",
-      "journeyDate": "20261013",
-      "commute": {
-        "publicTransport": null,
-        "walking": null
-      },
-      "crime": {
-        "month": "2026-08",
-        "total": 490,
-        "radiusMiles": 1,
-        "source": "data.police.uk"
-      },
-      "rentByBedroom": null,
-      "profile": {
-        "summary": "Bromley is an official electoral area in Bromley. Commute is measured from the area reference point, reported crime uses a one-mile radius, and rent uses the latest available ONS borough-level average for the selected bedroom count.",
-        "tags": [
-          "Bromley",
-          "Official area boundary"
-        ],
-        "source": "GLA ward geography + ONS + Police.uk + TfL"
-      },
-      "complete": false,
-      "sources": {
-        "geography": "Greater London Authority · London Wards (2022)",
-        "crime": "data.police.uk",
-        "commute": null,
-        "rent": null,
-        "profile": "GLA ward geography + ONS + Police.uk + TfL"
-      }
-    },
-    {
-      "id": "E05013655",
-      "wardCode": "E05013655",
-      "name": "Camden Town",
-      "borough": "Camden",
-      "referencePoint": {
-        "name": "Camden Town area reference point",
-        "lng": -0.14492972779722454,
-        "lat": 51.5410843210922
-      },
-      "destinationPostcode": "W1D 3QW",
-      "arriveBy": "0900",
-      "journeyDate": "20261013",
-      "commute": {
-        "publicTransport": null,
-        "walking": null
-      },
-      "crime": {
-        "month": "2026-08",
-        "total": 1416,
-        "radiusMiles": 1,
-        "source": "data.police.uk"
-      },
-      "rentByBedroom": null,
-      "profile": {
-        "summary": "Camden Town is an official electoral area in Camden. Commute is measured from the area reference point, reported crime uses a one-mile radius, and rent uses the latest available ONS borough-level average for the selected bedroom count.",
-        "tags": [
-          "Camden",
-          "Official area boundary"
-        ],
-        "source": "GLA ward geography + ONS + Police.uk + TfL"
-      },
-      "complete": false,
-      "sources": {
-        "geography": "Greater London Authority · London Wards (2022)",
-        "crime": "data.police.uk",
-        "commute": null,
-        "rent": null,
-        "profile": "GLA ward geography + ONS + Police.uk + TfL"
-      }
-    },
-    {
-      "id": "E05013610",
-      "wardCode": "E05013610",
-      "name": "Chiswick",
-      "borough": "Hounslow",
-      "referencePoint": {
-        "name": "Chiswick area reference point",
-        "lng": -0.2578204765386065,
-        "lat": 51.48284983384023
-      },
-      "destinationPostcode": "W1D 3QW",
-      "arriveBy": "0900",
-      "journeyDate": "20261013",
-      "commute": {
-        "publicTransport": null,
-        "walking": null
-      },
-      "crime": {
-        "month": "2026-08",
-        "total": 360,
-        "radiusMiles": 1,
-        "source": "data.police.uk"
-      },
-      "rentByBedroom": null,
-      "profile": {
-        "summary": "Chiswick is an official electoral area in Hounslow. Commute is measured from the area reference point, reported crime uses a one-mile radius, and rent uses the latest available ONS borough-level average for the selected bedroom count.",
-        "tags": [
-          "Hounslow",
-          "Official area boundary"
-        ],
-        "source": "GLA ward geography + ONS + Police.uk + TfL"
-      },
-      "complete": false,
-      "sources": {
-        "geography": "Greater London Authority · London Wards (2022)",
-        "crime": "data.police.uk",
-        "commute": null,
-        "rent": null,
-        "profile": "GLA ward geography + ONS + Police.uk + TfL"
-      }
-    },
-    {
-      "id": "E05014096",
-      "wardCode": "E05014096",
-      "name": "Brixton",
-      "borough": "Lambeth",
-      "referencePoint": {
-        "name": "Brixton area reference point",
-        "lng": -0.11205593904189157,
-        "lat": 51.46725355285046
-      },
-      "destinationPostcode": "W1D 3QW",
-      "arriveBy": "0900",
-      "journeyDate": "20261013",
-      "commute": {
-        "publicTransport": null,
-        "walking": null
-      },
-      "crime": {
-        "month": "2026-08",
-        "total": 1787,
-        "radiusMiles": 1,
-        "source": "data.police.uk"
-      },
-      "rentByBedroom": null,
-      "profile": {
-        "summary": "Brixton is an official electoral area in Lambeth. Commute is measured from the area reference point, reported crime uses a one-mile radius, and rent uses the latest available ONS borough-level average for the selected bedroom count.",
-        "tags": [
-          "Lambeth",
-          "Official area boundary"
-        ],
-        "source": "GLA ward geography + ONS + Police.uk + TfL"
-      },
-      "complete": false,
-      "sources": {
-        "geography": "Greater London Authority · London Wards (2022)",
-        "crime": "data.police.uk",
-        "commute": null,
-        "rent": null,
-        "profile": "GLA ward geography + ONS + Police.uk + TfL"
-      }
-    },
-    {
-      "id": "E05013829",
-      "wardCode": "E05013829",
-      "name": "Wimbledon",
-      "borough": "Merton",
-      "referencePoint": {
-        "name": "Wimbledon area reference point",
-        "lng": -0.20393018201469115,
-        "lat": 51.418052861493116
-      },
-      "destinationPostcode": "W1D 3QW",
-      "arriveBy": "0900",
-      "journeyDate": "20261013",
-      "commute": {
-        "publicTransport": null,
-        "walking": null
-      },
-      "crime": {
-        "month": "2026-08",
-        "total": 370,
-        "radiusMiles": 1,
-        "source": "data.police.uk"
-      },
-      "rentByBedroom": null,
-      "profile": {
-        "summary": "Wimbledon is an official electoral area in Merton. Commute is measured from the area reference point, reported crime uses a one-mile radius, and rent uses the latest available ONS borough-level average for the selected bedroom count.",
-        "tags": [
-          "Merton",
-          "Official area boundary"
-        ],
-        "source": "GLA ward geography + ONS + Police.uk + TfL"
-      },
-      "complete": false,
-      "sources": {
-        "geography": "Greater London Authority · London Wards (2022)",
-        "crime": "data.police.uk",
-        "commute": null,
-        "rent": null,
-        "profile": "GLA ward geography + ONS + Police.uk + TfL"
-      }
-    },
-    {
-      "id": "E05013925",
-      "wardCode": "E05013925",
-      "name": "Stratford",
-      "borough": "Newham",
-      "referencePoint": {
-        "name": "Stratford area reference point",
-        "lng": -0.011149222790995766,
-        "lat": 51.543597620933156
-      },
-      "destinationPostcode": "W1D 3QW",
-      "arriveBy": "0900",
-      "journeyDate": "20261013",
-      "commute": {
-        "publicTransport": null,
-        "walking": null
-      },
-      "crime": {
-        "month": "2026-08",
-        "total": 1349,
-        "radiusMiles": 1,
-        "source": "data.police.uk"
-      },
-      "rentByBedroom": null,
-      "profile": {
-        "summary": "Stratford is an official electoral area in Newham. Commute is measured from the area reference point, reported crime uses a one-mile radius, and rent uses the latest available ONS borough-level average for the selected bedroom count.",
-        "tags": [
-          "Newham",
-          "Official area boundary"
-        ],
-        "source": "GLA ward geography + ONS + Police.uk + TfL"
-      },
-      "complete": false,
-      "sources": {
-        "geography": "Greater London Authority · London Wards (2022)",
-        "crime": "data.police.uk",
-        "commute": null,
-        "rent": null,
-        "profile": "GLA ward geography + ONS + Police.uk + TfL"
-      }
-    },
-    {
-      "id": "E05011255",
-      "wardCode": "E05011255",
-      "name": "Wanstead",
-      "borough": "Redbridge",
-      "referencePoint": {
-        "name": "Wanstead area reference point",
-        "lng": 0.02687844894805999,
-        "lat": 51.57901038468501
-      },
-      "destinationPostcode": "W1D 3QW",
-      "arriveBy": "0900",
-      "journeyDate": "20261013",
-      "commute": {
-        "publicTransport": null,
-        "walking": null
-      },
-      "crime": {
-        "month": "2026-08",
-        "total": 263,
-        "radiusMiles": 1,
-        "source": "data.police.uk"
-      },
-      "rentByBedroom": null,
-      "profile": {
-        "summary": "Wanstead is an official electoral area in Redbridge. Commute is measured from the area reference point, reported crime uses a one-mile radius, and rent uses the latest available ONS borough-level average for the selected bedroom count.",
-        "tags": [
-          "Redbridge",
-          "Official area boundary"
-        ],
-        "source": "GLA ward geography + ONS + Police.uk + TfL"
-      },
-      "complete": false,
-      "sources": {
-        "geography": "Greater London Authority · London Wards (2022)",
-        "crime": "data.police.uk",
-        "commute": null,
-        "rent": null,
-        "profile": "GLA ward geography + ONS + Police.uk + TfL"
-      }
-    },
-    {
-      "id": "E05013784",
-      "wardCode": "E05013784",
-      "name": "Richmond",
-      "borough": "Richmond upon Thames",
-      "referencePoint": {
-        "name": "Richmond area reference point",
-        "lng": -0.2998067688205437,
-        "lat": 51.46710963361294
-      },
-      "destinationPostcode": "W1D 3QW",
-      "arriveBy": "0900",
-      "journeyDate": "20261013",
-      "commute": {
-        "publicTransport": null,
-        "walking": null
-      },
-      "crime": {
-        "month": "2026-08",
-        "total": 281,
-        "radiusMiles": 1,
-        "source": "data.police.uk"
-      },
-      "rentByBedroom": null,
-      "profile": {
-        "summary": "Richmond is an official electoral area in Richmond upon Thames. Commute is measured from the area reference point, reported crime uses a one-mile radius, and rent uses the latest available ONS borough-level average for the selected bedroom count.",
-        "tags": [
-          "Richmond upon Thames",
-          "Official area boundary"
-        ],
-        "source": "GLA ward geography + ONS + Police.uk + TfL"
-      },
-      "complete": false,
-      "sources": {
-        "geography": "Greater London Authority · London Wards (2022)",
-        "crime": "data.police.uk",
-        "commute": null,
-        "rent": null,
+        "rent": "ONS Price Index of Private Rents · local authority by property size",
         "profile": "GLA ward geography + ONS + Police.uk + TfL"
       }
     },
@@ -1752,7 +1543,12 @@
         "radiusMiles": 1,
         "source": "data.police.uk"
       },
-      "rentByBedroom": null,
+      "rentByBedroom": {
+        "1": 2001,
+        "2": 2489,
+        "3": 2846,
+        "4+": 3674
+      },
       "profile": {
         "summary": "Dalston is an official electoral area in Hackney. Commute is measured from the area reference point, reported crime uses a one-mile radius, and rent uses the latest available ONS borough-level average for the selected bedroom count.",
         "tags": [
@@ -1766,7 +1562,7 @@
         "geography": "Greater London Authority · London Wards (2022)",
         "crime": "data.police.uk",
         "commute": null,
-        "rent": null,
+        "rent": "ONS Price Index of Private Rents · local authority by property size",
         "profile": "GLA ward geography + ONS + Police.uk + TfL"
       }
     },
@@ -1793,7 +1589,12 @@
         "radiusMiles": 1,
         "source": "data.police.uk"
       },
-      "rentByBedroom": null,
+      "rentByBedroom": {
+        "1": 2001,
+        "2": 2489,
+        "3": 2846,
+        "4+": 3674
+      },
       "profile": {
         "summary": "Hoxton is an official electoral area in Hackney. Commute is measured from the area reference point, reported crime uses a one-mile radius, and rent uses the latest available ONS borough-level average for the selected bedroom count.",
         "tags": [
@@ -1807,7 +1608,7 @@
         "geography": "Greater London Authority · London Wards (2022)",
         "crime": "data.police.uk",
         "commute": null,
-        "rent": null,
+        "rent": "ONS Price Index of Private Rents · local authority by property size",
         "profile": "GLA ward geography + ONS + Police.uk + TfL"
       }
     },
@@ -1834,7 +1635,12 @@
         "radiusMiles": 1,
         "source": "data.police.uk"
       },
-      "rentByBedroom": null,
+      "rentByBedroom": {
+        "1": 2001,
+        "2": 2489,
+        "3": 2846,
+        "4+": 3674
+      },
       "profile": {
         "summary": "Stoke Newington is an official electoral area in Hackney. Commute is measured from the area reference point, reported crime uses a one-mile radius, and rent uses the latest available ONS borough-level average for the selected bedroom count.",
         "tags": [
@@ -1848,7 +1654,7 @@
         "geography": "Greater London Authority · London Wards (2022)",
         "crime": "data.police.uk",
         "commute": null,
-        "rent": null,
+        "rent": "ONS Price Index of Private Rents · local authority by property size",
         "profile": "GLA ward geography + ONS + Police.uk + TfL"
       }
     },
@@ -1875,7 +1681,12 @@
         "radiusMiles": 1,
         "source": "data.police.uk"
       },
-      "rentByBedroom": null,
+      "rentByBedroom": {
+        "1": 2178,
+        "2": 2697,
+        "3": 3005,
+        "4+": 4229
+      },
       "profile": {
         "summary": "Finsbury Park is an official electoral area in Islington. Commute is measured from the area reference point, reported crime uses a one-mile radius, and rent uses the latest available ONS borough-level average for the selected bedroom count.",
         "tags": [
@@ -1889,7 +1700,7 @@
         "geography": "Greater London Authority · London Wards (2022)",
         "crime": "data.police.uk",
         "commute": null,
-        "rent": null,
+        "rent": "ONS Price Index of Private Rents · local authority by property size",
         "profile": "GLA ward geography + ONS + Police.uk + TfL"
       }
     },
@@ -1916,7 +1727,12 @@
         "radiusMiles": 1,
         "source": "data.police.uk"
       },
-      "rentByBedroom": null,
+      "rentByBedroom": {
+        "1": 2178,
+        "2": 2697,
+        "3": 3005,
+        "4+": 4229
+      },
       "profile": {
         "summary": "Highbury is an official electoral area in Islington. Commute is measured from the area reference point, reported crime uses a one-mile radius, and rent uses the latest available ONS borough-level average for the selected bedroom count.",
         "tags": [
@@ -1930,7 +1746,7 @@
         "geography": "Greater London Authority · London Wards (2022)",
         "crime": "data.police.uk",
         "commute": null,
-        "rent": null,
+        "rent": "ONS Price Index of Private Rents · local authority by property size",
         "profile": "GLA ward geography + ONS + Police.uk + TfL"
       }
     },
@@ -1957,7 +1773,12 @@
         "radiusMiles": 1,
         "source": "data.police.uk"
       },
-      "rentByBedroom": null,
+      "rentByBedroom": {
+        "1": 2178,
+        "2": 2697,
+        "3": 3005,
+        "4+": 4229
+      },
       "profile": {
         "summary": "Clerkenwell is an official electoral area in Islington. Commute is measured from the area reference point, reported crime uses a one-mile radius, and rent uses the latest available ONS borough-level average for the selected bedroom count.",
         "tags": [
@@ -1971,7 +1792,7 @@
         "geography": "Greater London Authority · London Wards (2022)",
         "crime": "data.police.uk",
         "commute": null,
-        "rent": null,
+        "rent": "ONS Price Index of Private Rents · local authority by property size",
         "profile": "GLA ward geography + ONS + Police.uk + TfL"
       }
     },
@@ -1998,7 +1819,12 @@
         "radiusMiles": 1,
         "source": "data.police.uk"
       },
-      "rentByBedroom": null,
+      "rentByBedroom": {
+        "1": 2054,
+        "2": 2621,
+        "3": 3055,
+        "4+": 3967
+      },
       "profile": {
         "summary": "King's Cross is an official electoral area in Camden. Commute is measured from the area reference point, reported crime uses a one-mile radius, and rent uses the latest available ONS borough-level average for the selected bedroom count.",
         "tags": [
@@ -2012,7 +1838,7 @@
         "geography": "Greater London Authority · London Wards (2022)",
         "crime": "data.police.uk",
         "commute": null,
-        "rent": null,
+        "rent": "ONS Price Index of Private Rents · local authority by property size",
         "profile": "GLA ward geography + ONS + Police.uk + TfL"
       }
     },
@@ -2039,7 +1865,12 @@
         "radiusMiles": 1,
         "source": "data.police.uk"
       },
-      "rentByBedroom": null,
+      "rentByBedroom": {
+        "1": 2054,
+        "2": 2621,
+        "3": 3055,
+        "4+": 3967
+      },
       "profile": {
         "summary": "Hampstead is an official electoral area in Camden. Commute is measured from the area reference point, reported crime uses a one-mile radius, and rent uses the latest available ONS borough-level average for the selected bedroom count.",
         "tags": [
@@ -2053,7 +1884,7 @@
         "geography": "Greater London Authority · London Wards (2022)",
         "crime": "data.police.uk",
         "commute": null,
-        "rent": null,
+        "rent": "ONS Price Index of Private Rents · local authority by property size",
         "profile": "GLA ward geography + ONS + Police.uk + TfL"
       }
     },
@@ -2080,7 +1911,12 @@
         "radiusMiles": 1,
         "source": "data.police.uk"
       },
-      "rentByBedroom": null,
+      "rentByBedroom": {
+        "1": 2054,
+        "2": 2621,
+        "3": 3055,
+        "4+": 3967
+      },
       "profile": {
         "summary": "West Hampstead is an official electoral area in Camden. Commute is measured from the area reference point, reported crime uses a one-mile radius, and rent uses the latest available ONS borough-level average for the selected bedroom count.",
         "tags": [
@@ -2094,7 +1930,7 @@
         "geography": "Greater London Authority · London Wards (2022)",
         "crime": "data.police.uk",
         "commute": null,
-        "rent": null,
+        "rent": "ONS Price Index of Private Rents · local authority by property size",
         "profile": "GLA ward geography + ONS + Police.uk + TfL"
       }
     },
@@ -2121,7 +1957,12 @@
         "radiusMiles": 1,
         "source": "data.police.uk"
       },
-      "rentByBedroom": null,
+      "rentByBedroom": {
+        "1": 2054,
+        "2": 2621,
+        "3": 3055,
+        "4+": 3967
+      },
       "profile": {
         "summary": "Kentish Town is an official electoral area in Camden. Commute is measured from the area reference point, reported crime uses a one-mile radius, and rent uses the latest available ONS borough-level average for the selected bedroom count.",
         "tags": [
@@ -2135,7 +1976,7 @@
         "geography": "Greater London Authority · London Wards (2022)",
         "crime": "data.police.uk",
         "commute": null,
-        "rent": null,
+        "rent": "ONS Price Index of Private Rents · local authority by property size",
         "profile": "GLA ward geography + ONS + Police.uk + TfL"
       }
     },
@@ -2162,7 +2003,12 @@
         "radiusMiles": 1,
         "source": "data.police.uk"
       },
-      "rentByBedroom": null,
+      "rentByBedroom": {
+        "1": 2054,
+        "2": 2621,
+        "3": 3055,
+        "4+": 3967
+      },
       "profile": {
         "summary": "Primrose Hill is an official electoral area in Camden. Commute is measured from the area reference point, reported crime uses a one-mile radius, and rent uses the latest available ONS borough-level average for the selected bedroom count.",
         "tags": [
@@ -2176,7 +2022,7 @@
         "geography": "Greater London Authority · London Wards (2022)",
         "crime": "data.police.uk",
         "commute": null,
-        "rent": null,
+        "rent": "ONS Price Index of Private Rents · local authority by property size",
         "profile": "GLA ward geography + ONS + Police.uk + TfL"
       }
     },
@@ -2203,7 +2049,12 @@
         "radiusMiles": 1,
         "source": "data.police.uk"
       },
-      "rentByBedroom": null,
+      "rentByBedroom": {
+        "1": 2548,
+        "2": 3305,
+        "3": 3895,
+        "4+": 5424
+      },
       "profile": {
         "summary": "Marylebone is an official electoral area in Westminster. Commute is measured from the area reference point, reported crime uses a one-mile radius, and rent uses the latest available ONS borough-level average for the selected bedroom count.",
         "tags": [
@@ -2217,7 +2068,7 @@
         "geography": "Greater London Authority · London Wards (2022)",
         "crime": "data.police.uk",
         "commute": null,
-        "rent": null,
+        "rent": "ONS Price Index of Private Rents · local authority by property size",
         "profile": "GLA ward geography + ONS + Police.uk + TfL"
       }
     },
@@ -2244,7 +2095,12 @@
         "radiusMiles": 1,
         "source": "data.police.uk"
       },
-      "rentByBedroom": null,
+      "rentByBedroom": {
+        "1": 2548,
+        "2": 3305,
+        "3": 3895,
+        "4+": 5424
+      },
       "profile": {
         "summary": "Maida Vale is an official electoral area in Westminster. Commute is measured from the area reference point, reported crime uses a one-mile radius, and rent uses the latest available ONS borough-level average for the selected bedroom count.",
         "tags": [
@@ -2258,7 +2114,7 @@
         "geography": "Greater London Authority · London Wards (2022)",
         "crime": "data.police.uk",
         "commute": null,
-        "rent": null,
+        "rent": "ONS Price Index of Private Rents · local authority by property size",
         "profile": "GLA ward geography + ONS + Police.uk + TfL"
       }
     },
@@ -2285,7 +2141,12 @@
         "radiusMiles": 1,
         "source": "data.police.uk"
       },
-      "rentByBedroom": null,
+      "rentByBedroom": {
+        "1": 2548,
+        "2": 3305,
+        "3": 3895,
+        "4+": 5424
+      },
       "profile": {
         "summary": "Pimlico is an official electoral area in Westminster. Commute is measured from the area reference point, reported crime uses a one-mile radius, and rent uses the latest available ONS borough-level average for the selected bedroom count.",
         "tags": [
@@ -2299,7 +2160,7 @@
         "geography": "Greater London Authority · London Wards (2022)",
         "crime": "data.police.uk",
         "commute": null,
-        "rent": null,
+        "rent": "ONS Price Index of Private Rents · local authority by property size",
         "profile": "GLA ward geography + ONS + Police.uk + TfL"
       }
     },
@@ -2326,7 +2187,12 @@
         "radiusMiles": 1,
         "source": "data.police.uk"
       },
-      "rentByBedroom": null,
+      "rentByBedroom": {
+        "1": 2548,
+        "2": 3305,
+        "3": 3895,
+        "4+": 5424
+      },
       "profile": {
         "summary": "Bayswater is an official electoral area in Westminster. Commute is measured from the area reference point, reported crime uses a one-mile radius, and rent uses the latest available ONS borough-level average for the selected bedroom count.",
         "tags": [
@@ -2340,7 +2206,7 @@
         "geography": "Greater London Authority · London Wards (2022)",
         "crime": "data.police.uk",
         "commute": null,
-        "rent": null,
+        "rent": "ONS Price Index of Private Rents · local authority by property size",
         "profile": "GLA ward geography + ONS + Police.uk + TfL"
       }
     },
@@ -2367,7 +2233,12 @@
         "radiusMiles": 1,
         "source": "data.police.uk"
       },
-      "rentByBedroom": null,
+      "rentByBedroom": {
+        "1": 2640,
+        "2": 3428,
+        "3": 4074,
+        "4+": 5650
+      },
       "profile": {
         "summary": "Chelsea is an official electoral area in Kensington and Chelsea. Commute is measured from the area reference point, reported crime uses a one-mile radius, and rent uses the latest available ONS borough-level average for the selected bedroom count.",
         "tags": [
@@ -2381,7 +2252,7 @@
         "geography": "Greater London Authority · London Wards (2022)",
         "crime": "data.police.uk",
         "commute": null,
-        "rent": null,
+        "rent": "ONS Price Index of Private Rents · local authority by property size",
         "profile": "GLA ward geography + ONS + Police.uk + TfL"
       }
     },
@@ -2408,7 +2279,12 @@
         "radiusMiles": 1,
         "source": "data.police.uk"
       },
-      "rentByBedroom": null,
+      "rentByBedroom": {
+        "1": 2640,
+        "2": 3428,
+        "3": 4074,
+        "4+": 5650
+      },
       "profile": {
         "summary": "Earl's Court is an official electoral area in Kensington and Chelsea. Commute is measured from the area reference point, reported crime uses a one-mile radius, and rent uses the latest available ONS borough-level average for the selected bedroom count.",
         "tags": [
@@ -2422,7 +2298,7 @@
         "geography": "Greater London Authority · London Wards (2022)",
         "crime": "data.police.uk",
         "commute": null,
-        "rent": null,
+        "rent": "ONS Price Index of Private Rents · local authority by property size",
         "profile": "GLA ward geography + ONS + Police.uk + TfL"
       }
     },
@@ -2449,7 +2325,12 @@
         "radiusMiles": 1,
         "source": "data.police.uk"
       },
-      "rentByBedroom": null,
+      "rentByBedroom": {
+        "1": 2000,
+        "2": 2622,
+        "3": 2992,
+        "4+": 4181
+      },
       "profile": {
         "summary": "Fulham is an official electoral area in Hammersmith and Fulham. Commute is measured from the area reference point, reported crime uses a one-mile radius, and rent uses the latest available ONS borough-level average for the selected bedroom count.",
         "tags": [
@@ -2463,7 +2344,7 @@
         "geography": "Greater London Authority · London Wards (2022)",
         "crime": "data.police.uk",
         "commute": null,
-        "rent": null,
+        "rent": "ONS Price Index of Private Rents · local authority by property size",
         "profile": "GLA ward geography + ONS + Police.uk + TfL"
       }
     },
@@ -2490,7 +2371,12 @@
         "radiusMiles": 1,
         "source": "data.police.uk"
       },
-      "rentByBedroom": null,
+      "rentByBedroom": {
+        "1": 2000,
+        "2": 2622,
+        "3": 2992,
+        "4+": 4181
+      },
       "profile": {
         "summary": "Shepherd's Bush is an official electoral area in Hammersmith and Fulham. Commute is measured from the area reference point, reported crime uses a one-mile radius, and rent uses the latest available ONS borough-level average for the selected bedroom count.",
         "tags": [
@@ -2504,7 +2390,7 @@
         "geography": "Greater London Authority · London Wards (2022)",
         "crime": "data.police.uk",
         "commute": null,
-        "rent": null,
+        "rent": "ONS Price Index of Private Rents · local authority by property size",
         "profile": "GLA ward geography + ONS + Police.uk + TfL"
       }
     },
@@ -2531,7 +2417,12 @@
         "radiusMiles": 1,
         "source": "data.police.uk"
       },
-      "rentByBedroom": null,
+      "rentByBedroom": {
+        "1": 1882,
+        "2": 2342,
+        "3": 2682,
+        "4+": 3715
+      },
       "profile": {
         "summary": "Clapham is an official electoral area in Lambeth. Commute is measured from the area reference point, reported crime uses a one-mile radius, and rent uses the latest available ONS borough-level average for the selected bedroom count.",
         "tags": [
@@ -2545,7 +2436,7 @@
         "geography": "Greater London Authority · London Wards (2022)",
         "crime": "data.police.uk",
         "commute": null,
-        "rent": null,
+        "rent": "ONS Price Index of Private Rents · local authority by property size",
         "profile": "GLA ward geography + ONS + Police.uk + TfL"
       }
     },
@@ -2572,7 +2463,12 @@
         "radiusMiles": 1,
         "source": "data.police.uk"
       },
-      "rentByBedroom": null,
+      "rentByBedroom": {
+        "1": 1882,
+        "2": 2342,
+        "3": 2682,
+        "4+": 3715
+      },
       "profile": {
         "summary": "Vauxhall is an official electoral area in Lambeth. Commute is measured from the area reference point, reported crime uses a one-mile radius, and rent uses the latest available ONS borough-level average for the selected bedroom count.",
         "tags": [
@@ -2586,7 +2482,7 @@
         "geography": "Greater London Authority · London Wards (2022)",
         "crime": "data.police.uk",
         "commute": null,
-        "rent": null,
+        "rent": "ONS Price Index of Private Rents · local authority by property size",
         "profile": "GLA ward geography + ONS + Police.uk + TfL"
       }
     },
@@ -2613,7 +2509,12 @@
         "radiusMiles": 1,
         "source": "data.police.uk"
       },
-      "rentByBedroom": null,
+      "rentByBedroom": {
+        "1": 1882,
+        "2": 2342,
+        "3": 2682,
+        "4+": 3715
+      },
       "profile": {
         "summary": "Streatham is an official electoral area in Lambeth. Commute is measured from the area reference point, reported crime uses a one-mile radius, and rent uses the latest available ONS borough-level average for the selected bedroom count.",
         "tags": [
@@ -2627,7 +2528,7 @@
         "geography": "Greater London Authority · London Wards (2022)",
         "crime": "data.police.uk",
         "commute": null,
-        "rent": null,
+        "rent": "ONS Price Index of Private Rents · local authority by property size",
         "profile": "GLA ward geography + ONS + Police.uk + TfL"
       }
     },
@@ -2654,7 +2555,12 @@
         "radiusMiles": 1,
         "source": "data.police.uk"
       },
-      "rentByBedroom": null,
+      "rentByBedroom": {
+        "1": 1876,
+        "2": 2348,
+        "3": 2732,
+        "4+": 3608
+      },
       "profile": {
         "summary": "Peckham is an official electoral area in Southwark. Commute is measured from the area reference point, reported crime uses a one-mile radius, and rent uses the latest available ONS borough-level average for the selected bedroom count.",
         "tags": [
@@ -2668,7 +2574,7 @@
         "geography": "Greater London Authority · London Wards (2022)",
         "crime": "data.police.uk",
         "commute": null,
-        "rent": null,
+        "rent": "ONS Price Index of Private Rents · local authority by property size",
         "profile": "GLA ward geography + ONS + Police.uk + TfL"
       }
     },
@@ -2695,7 +2601,12 @@
         "radiusMiles": 1,
         "source": "data.police.uk"
       },
-      "rentByBedroom": null,
+      "rentByBedroom": {
+        "1": 1876,
+        "2": 2348,
+        "3": 2732,
+        "4+": 3608
+      },
       "profile": {
         "summary": "Bermondsey is an official electoral area in Southwark. Commute is measured from the area reference point, reported crime uses a one-mile radius, and rent uses the latest available ONS borough-level average for the selected bedroom count.",
         "tags": [
@@ -2709,7 +2620,7 @@
         "geography": "Greater London Authority · London Wards (2022)",
         "crime": "data.police.uk",
         "commute": null,
-        "rent": null,
+        "rent": "ONS Price Index of Private Rents · local authority by property size",
         "profile": "GLA ward geography + ONS + Police.uk + TfL"
       }
     },
@@ -2736,7 +2647,12 @@
         "radiusMiles": 1,
         "source": "data.police.uk"
       },
-      "rentByBedroom": null,
+      "rentByBedroom": {
+        "1": 1876,
+        "2": 2348,
+        "3": 2732,
+        "4+": 3608
+      },
       "profile": {
         "summary": "Rotherhithe is an official electoral area in Southwark. Commute is measured from the area reference point, reported crime uses a one-mile radius, and rent uses the latest available ONS borough-level average for the selected bedroom count.",
         "tags": [
@@ -2750,7 +2666,7 @@
         "geography": "Greater London Authority · London Wards (2022)",
         "crime": "data.police.uk",
         "commute": null,
-        "rent": null,
+        "rent": "ONS Price Index of Private Rents · local authority by property size",
         "profile": "GLA ward geography + ONS + Police.uk + TfL"
       }
     },
@@ -2777,7 +2693,12 @@
         "radiusMiles": 1,
         "source": "data.police.uk"
       },
-      "rentByBedroom": null,
+      "rentByBedroom": {
+        "1": 1876,
+        "2": 2348,
+        "3": 2732,
+        "4+": 3608
+      },
       "profile": {
         "summary": "Dulwich is an official electoral area in Southwark. Commute is measured from the area reference point, reported crime uses a one-mile radius, and rent uses the latest available ONS borough-level average for the selected bedroom count.",
         "tags": [
@@ -2791,7 +2712,7 @@
         "geography": "Greater London Authority · London Wards (2022)",
         "crime": "data.police.uk",
         "commute": null,
-        "rent": null,
+        "rent": "ONS Price Index of Private Rents · local authority by property size",
         "profile": "GLA ward geography + ONS + Police.uk + TfL"
       }
     },
@@ -2818,7 +2739,12 @@
         "radiusMiles": 1,
         "source": "data.police.uk"
       },
-      "rentByBedroom": null,
+      "rentByBedroom": {
+        "1": 1876,
+        "2": 2348,
+        "3": 2732,
+        "4+": 3608
+      },
       "profile": {
         "summary": "Camberwell is an official electoral area in Southwark. Commute is measured from the area reference point, reported crime uses a one-mile radius, and rent uses the latest available ONS borough-level average for the selected bedroom count.",
         "tags": [
@@ -2832,7 +2758,7 @@
         "geography": "Greater London Authority · London Wards (2022)",
         "crime": "data.police.uk",
         "commute": null,
-        "rent": null,
+        "rent": "ONS Price Index of Private Rents · local authority by property size",
         "profile": "GLA ward geography + ONS + Police.uk + TfL"
       }
     },
@@ -2859,7 +2785,12 @@
         "radiusMiles": 1,
         "source": "data.police.uk"
       },
-      "rentByBedroom": null,
+      "rentByBedroom": {
+        "1": 1457,
+        "2": 1789,
+        "3": 2057,
+        "4+": 2714
+      },
       "profile": {
         "summary": "Deptford is an official electoral area in Lewisham. Commute is measured from the area reference point, reported crime uses a one-mile radius, and rent uses the latest available ONS borough-level average for the selected bedroom count.",
         "tags": [
@@ -2873,7 +2804,7 @@
         "geography": "Greater London Authority · London Wards (2022)",
         "crime": "data.police.uk",
         "commute": null,
-        "rent": null,
+        "rent": "ONS Price Index of Private Rents · local authority by property size",
         "profile": "GLA ward geography + ONS + Police.uk + TfL"
       }
     },
@@ -2900,7 +2831,12 @@
         "radiusMiles": 1,
         "source": "data.police.uk"
       },
-      "rentByBedroom": null,
+      "rentByBedroom": {
+        "1": 1457,
+        "2": 1789,
+        "3": 2057,
+        "4+": 2714
+      },
       "profile": {
         "summary": "Forest Hill is an official electoral area in Lewisham. Commute is measured from the area reference point, reported crime uses a one-mile radius, and rent uses the latest available ONS borough-level average for the selected bedroom count.",
         "tags": [
@@ -2914,7 +2850,7 @@
         "geography": "Greater London Authority · London Wards (2022)",
         "crime": "data.police.uk",
         "commute": null,
-        "rent": null,
+        "rent": "ONS Price Index of Private Rents · local authority by property size",
         "profile": "GLA ward geography + ONS + Police.uk + TfL"
       }
     },
@@ -2941,7 +2877,12 @@
         "radiusMiles": 1,
         "source": "data.police.uk"
       },
-      "rentByBedroom": null,
+      "rentByBedroom": {
+        "1": 1457,
+        "2": 1789,
+        "3": 2057,
+        "4+": 2714
+      },
       "profile": {
         "summary": "Catford is an official electoral area in Lewisham. Commute is measured from the area reference point, reported crime uses a one-mile radius, and rent uses the latest available ONS borough-level average for the selected bedroom count.",
         "tags": [
@@ -2955,7 +2896,7 @@
         "geography": "Greater London Authority · London Wards (2022)",
         "crime": "data.police.uk",
         "commute": null,
-        "rent": null,
+        "rent": "ONS Price Index of Private Rents · local authority by property size",
         "profile": "GLA ward geography + ONS + Police.uk + TfL"
       }
     },
@@ -2982,7 +2923,12 @@
         "radiusMiles": 1,
         "source": "data.police.uk"
       },
-      "rentByBedroom": null,
+      "rentByBedroom": {
+        "1": 1938,
+        "2": 2463,
+        "3": 2810,
+        "4+": 3818
+      },
       "profile": {
         "summary": "Tooting is an official electoral area in Wandsworth. Commute is measured from the area reference point, reported crime uses a one-mile radius, and rent uses the latest available ONS borough-level average for the selected bedroom count.",
         "tags": [
@@ -2996,7 +2942,7 @@
         "geography": "Greater London Authority · London Wards (2022)",
         "crime": "data.police.uk",
         "commute": null,
-        "rent": null,
+        "rent": "ONS Price Index of Private Rents · local authority by property size",
         "profile": "GLA ward geography + ONS + Police.uk + TfL"
       }
     },
@@ -3023,7 +2969,12 @@
         "radiusMiles": 1,
         "source": "data.police.uk"
       },
-      "rentByBedroom": null,
+      "rentByBedroom": {
+        "1": 1938,
+        "2": 2463,
+        "3": 2810,
+        "4+": 3818
+      },
       "profile": {
         "summary": "Putney is an official electoral area in Wandsworth. Commute is measured from the area reference point, reported crime uses a one-mile radius, and rent uses the latest available ONS borough-level average for the selected bedroom count.",
         "tags": [
@@ -3037,7 +2988,7 @@
         "geography": "Greater London Authority · London Wards (2022)",
         "crime": "data.police.uk",
         "commute": null,
-        "rent": null,
+        "rent": "ONS Price Index of Private Rents · local authority by property size",
         "profile": "GLA ward geography + ONS + Police.uk + TfL"
       }
     },
@@ -3064,7 +3015,12 @@
         "radiusMiles": 1,
         "source": "data.police.uk"
       },
-      "rentByBedroom": null,
+      "rentByBedroom": {
+        "1": 1938,
+        "2": 2463,
+        "3": 2810,
+        "4+": 3818
+      },
       "profile": {
         "summary": "Balham is an official electoral area in Wandsworth. Commute is measured from the area reference point, reported crime uses a one-mile radius, and rent uses the latest available ONS borough-level average for the selected bedroom count.",
         "tags": [
@@ -3078,7 +3034,7 @@
         "geography": "Greater London Authority · London Wards (2022)",
         "crime": "data.police.uk",
         "commute": null,
-        "rent": null,
+        "rent": "ONS Price Index of Private Rents · local authority by property size",
         "profile": "GLA ward geography + ONS + Police.uk + TfL"
       }
     },
@@ -3105,7 +3061,12 @@
         "radiusMiles": 1,
         "source": "data.police.uk"
       },
-      "rentByBedroom": null,
+      "rentByBedroom": {
+        "1": 1629,
+        "2": 2033,
+        "3": 2406,
+        "4+": 3287
+      },
       "profile": {
         "summary": "Acton is an official electoral area in Ealing. Commute is measured from the area reference point, reported crime uses a one-mile radius, and rent uses the latest available ONS borough-level average for the selected bedroom count.",
         "tags": [
@@ -3119,7 +3080,7 @@
         "geography": "Greater London Authority · London Wards (2022)",
         "crime": "data.police.uk",
         "commute": null,
-        "rent": null,
+        "rent": "ONS Price Index of Private Rents · local authority by property size",
         "profile": "GLA ward geography + ONS + Police.uk + TfL"
       }
     },
@@ -3146,7 +3107,12 @@
         "radiusMiles": 1,
         "source": "data.police.uk"
       },
-      "rentByBedroom": null,
+      "rentByBedroom": {
+        "1": 1629,
+        "2": 2033,
+        "3": 2406,
+        "4+": 3287
+      },
       "profile": {
         "summary": "Hanwell is an official electoral area in Ealing. Commute is measured from the area reference point, reported crime uses a one-mile radius, and rent uses the latest available ONS borough-level average for the selected bedroom count.",
         "tags": [
@@ -3160,7 +3126,7 @@
         "geography": "Greater London Authority · London Wards (2022)",
         "crime": "data.police.uk",
         "commute": null,
-        "rent": null,
+        "rent": "ONS Price Index of Private Rents · local authority by property size",
         "profile": "GLA ward geography + ONS + Police.uk + TfL"
       }
     },
@@ -3187,7 +3153,12 @@
         "radiusMiles": 1,
         "source": "data.police.uk"
       },
-      "rentByBedroom": null,
+      "rentByBedroom": {
+        "1": 1629,
+        "2": 2033,
+        "3": 2406,
+        "4+": 3287
+      },
       "profile": {
         "summary": "Southall is an official electoral area in Ealing. Commute is measured from the area reference point, reported crime uses a one-mile radius, and rent uses the latest available ONS borough-level average for the selected bedroom count.",
         "tags": [
@@ -3201,7 +3172,7 @@
         "geography": "Greater London Authority · London Wards (2022)",
         "crime": "data.police.uk",
         "commute": null,
-        "rent": null,
+        "rent": "ONS Price Index of Private Rents · local authority by property size",
         "profile": "GLA ward geography + ONS + Police.uk + TfL"
       }
     },
@@ -3228,7 +3199,12 @@
         "radiusMiles": 1,
         "source": "data.police.uk"
       },
-      "rentByBedroom": null,
+      "rentByBedroom": {
+        "1": 1583,
+        "2": 1947,
+        "3": 2241,
+        "4+": 3076
+      },
       "profile": {
         "summary": "Brentford is an official electoral area in Hounslow. Commute is measured from the area reference point, reported crime uses a one-mile radius, and rent uses the latest available ONS borough-level average for the selected bedroom count.",
         "tags": [
@@ -3242,7 +3218,7 @@
         "geography": "Greater London Authority · London Wards (2022)",
         "crime": "data.police.uk",
         "commute": null,
-        "rent": null,
+        "rent": "ONS Price Index of Private Rents · local authority by property size",
         "profile": "GLA ward geography + ONS + Police.uk + TfL"
       }
     },
@@ -3269,7 +3245,12 @@
         "radiusMiles": 1,
         "source": "data.police.uk"
       },
-      "rentByBedroom": null,
+      "rentByBedroom": {
+        "1": 1732,
+        "2": 2222,
+        "3": 2684,
+        "4+": 3907
+      },
       "profile": {
         "summary": "Twickenham is an official electoral area in Richmond upon Thames. Commute is measured from the area reference point, reported crime uses a one-mile radius, and rent uses the latest available ONS borough-level average for the selected bedroom count.",
         "tags": [
@@ -3283,7 +3264,421 @@
         "geography": "Greater London Authority · London Wards (2022)",
         "crime": "data.police.uk",
         "commute": null,
-        "rent": null,
+        "rent": "ONS Price Index of Private Rents · local authority by property size",
+        "profile": "GLA ward geography + ONS + Police.uk + TfL"
+      }
+    },
+    {
+      "id": "E05013782",
+      "wardCode": "E05013782",
+      "name": "Kew",
+      "borough": "Richmond upon Thames",
+      "referencePoint": {
+        "name": "Kew area reference point",
+        "lng": -0.28867922526586093,
+        "lat": 51.47712457369982
+      },
+      "destinationPostcode": "W1D 3QW",
+      "arriveBy": "0900",
+      "journeyDate": "20261013",
+      "commute": {
+        "publicTransport": null,
+        "walking": null
+      },
+      "crime": {
+        "month": "2026-08",
+        "total": 368,
+        "radiusMiles": 1,
+        "source": "data.police.uk"
+      },
+      "rentByBedroom": {
+        "1": 1732,
+        "2": 2222,
+        "3": 2684,
+        "4+": 3907
+      },
+      "profile": {
+        "summary": "Kew is an official electoral area in Richmond upon Thames. Commute is measured from the area reference point, reported crime uses a one-mile radius, and rent uses the latest available ONS borough-level average for the selected bedroom count.",
+        "tags": [
+          "Richmond upon Thames",
+          "Official area boundary"
+        ],
+        "source": "GLA ward geography + ONS + Police.uk + TfL"
+      },
+      "complete": false,
+      "sources": {
+        "geography": "Greater London Authority · London Wards (2022)",
+        "crime": "data.police.uk",
+        "commute": null,
+        "rent": "ONS Price Index of Private Rents · local authority by property size",
+        "profile": "GLA ward geography + ONS + Police.uk + TfL"
+      }
+    },
+    {
+      "id": "E05013594",
+      "wardCode": "E05013594",
+      "name": "Muswell Hill",
+      "borough": "Haringey",
+      "referencePoint": {
+        "name": "Muswell Hill area reference point",
+        "lng": -0.14136868889236132,
+        "lat": 51.58739696445608
+      },
+      "destinationPostcode": "W1D 3QW",
+      "arriveBy": "0900",
+      "journeyDate": "20261013",
+      "commute": {
+        "publicTransport": null,
+        "walking": null
+      },
+      "crime": {
+        "month": "2026-08",
+        "total": 376,
+        "radiusMiles": 1,
+        "source": "data.police.uk"
+      },
+      "rentByBedroom": {
+        "1": 1639,
+        "2": 2034,
+        "3": 2356,
+        "4+": 3186
+      },
+      "profile": {
+        "summary": "Muswell Hill is an official electoral area in Haringey. Commute is measured from the area reference point, reported crime uses a one-mile radius, and rent uses the latest available ONS borough-level average for the selected bedroom count.",
+        "tags": [
+          "Haringey",
+          "Official area boundary"
+        ],
+        "source": "GLA ward geography + ONS + Police.uk + TfL"
+      },
+      "complete": false,
+      "sources": {
+        "geography": "Greater London Authority · London Wards (2022)",
+        "crime": "data.police.uk",
+        "commute": null,
+        "rent": "ONS Price Index of Private Rents · local authority by property size",
+        "profile": "GLA ward geography + ONS + Police.uk + TfL"
+      }
+    },
+    {
+      "id": "E05013602",
+      "wardCode": "E05013602",
+      "name": "Tottenham Hale",
+      "borough": "Haringey",
+      "referencePoint": {
+        "name": "Tottenham Hale area reference point",
+        "lng": -0.061476293031801646,
+        "lat": 51.59224684238698
+      },
+      "destinationPostcode": "W1D 3QW",
+      "arriveBy": "0900",
+      "journeyDate": "20261013",
+      "commute": {
+        "publicTransport": null,
+        "walking": null
+      },
+      "crime": {
+        "month": "2026-08",
+        "total": 1110,
+        "radiusMiles": 1,
+        "source": "data.police.uk"
+      },
+      "rentByBedroom": {
+        "1": 1639,
+        "2": 2034,
+        "3": 2356,
+        "4+": 3186
+      },
+      "profile": {
+        "summary": "Tottenham Hale is an official electoral area in Haringey. Commute is measured from the area reference point, reported crime uses a one-mile radius, and rent uses the latest available ONS borough-level average for the selected bedroom count.",
+        "tags": [
+          "Haringey",
+          "Official area boundary"
+        ],
+        "source": "GLA ward geography + ONS + Police.uk + TfL"
+      },
+      "complete": false,
+      "sources": {
+        "geography": "Greater London Authority · London Wards (2022)",
+        "crime": "data.police.uk",
+        "commute": null,
+        "rent": "ONS Price Index of Private Rents · local authority by property size",
+        "profile": "GLA ward geography + ONS + Police.uk + TfL"
+      }
+    },
+    {
+      "id": "E05013897",
+      "wardCode": "E05013897",
+      "name": "Leytonstone",
+      "borough": "Waltham Forest",
+      "referencePoint": {
+        "name": "Leytonstone area reference point",
+        "lng": 0.009088346854943271,
+        "lat": 51.56912183525992
+      },
+      "destinationPostcode": "W1D 3QW",
+      "arriveBy": "0900",
+      "journeyDate": "20261013",
+      "commute": {
+        "publicTransport": null,
+        "walking": null
+      },
+      "crime": {
+        "month": "2026-08",
+        "total": 741,
+        "radiusMiles": 1,
+        "source": "data.police.uk"
+      },
+      "rentByBedroom": {
+        "1": 1400,
+        "2": 1723,
+        "3": 2023,
+        "4+": 2565
+      },
+      "profile": {
+        "summary": "Leytonstone is an official electoral area in Waltham Forest. Commute is measured from the area reference point, reported crime uses a one-mile radius, and rent uses the latest available ONS borough-level average for the selected bedroom count.",
+        "tags": [
+          "Waltham Forest",
+          "Official area boundary"
+        ],
+        "source": "GLA ward geography + ONS + Police.uk + TfL"
+      },
+      "complete": false,
+      "sources": {
+        "geography": "Greater London Authority · London Wards (2022)",
+        "crime": "data.police.uk",
+        "commute": null,
+        "rent": "ONS Price Index of Private Rents · local authority by property size",
+        "profile": "GLA ward geography + ONS + Police.uk + TfL"
+      }
+    },
+    {
+      "id": "E05013896",
+      "wardCode": "E05013896",
+      "name": "Leyton",
+      "borough": "Waltham Forest",
+      "referencePoint": {
+        "name": "Leyton area reference point",
+        "lng": -0.016683564507382277,
+        "lat": 51.561294881405615
+      },
+      "destinationPostcode": "W1D 3QW",
+      "arriveBy": "0900",
+      "journeyDate": "20261013",
+      "commute": {
+        "publicTransport": null,
+        "walking": null
+      },
+      "crime": {
+        "month": "2026-08",
+        "total": 668,
+        "radiusMiles": 1,
+        "source": "data.police.uk"
+      },
+      "rentByBedroom": {
+        "1": 1400,
+        "2": 1723,
+        "3": 2023,
+        "4+": 2565
+      },
+      "profile": {
+        "summary": "Leyton is an official electoral area in Waltham Forest. Commute is measured from the area reference point, reported crime uses a one-mile radius, and rent uses the latest available ONS borough-level average for the selected bedroom count.",
+        "tags": [
+          "Waltham Forest",
+          "Official area boundary"
+        ],
+        "source": "GLA ward geography + ONS + Police.uk + TfL"
+      },
+      "complete": false,
+      "sources": {
+        "geography": "Greater London Authority · London Wards (2022)",
+        "crime": "data.police.uk",
+        "commute": null,
+        "rent": "ONS Price Index of Private Rents · local authority by property size",
+        "profile": "GLA ward geography + ONS + Police.uk + TfL"
+      }
+    },
+    {
+      "id": "E05013906",
+      "wardCode": "E05013906",
+      "name": "Canning Town",
+      "borough": "Newham",
+      "referencePoint": {
+        "name": "Canning Town area reference point",
+        "lng": 0.004041594880810691,
+        "lat": 51.52190318317774
+      },
+      "destinationPostcode": "W1D 3QW",
+      "arriveBy": "0900",
+      "journeyDate": "20261013",
+      "commute": {
+        "publicTransport": null,
+        "walking": null
+      },
+      "crime": {
+        "month": "2026-08",
+        "total": 1197,
+        "radiusMiles": 1,
+        "source": "data.police.uk"
+      },
+      "rentByBedroom": {
+        "1": 1630,
+        "2": 1993,
+        "3": 2212,
+        "4+": 2672
+      },
+      "profile": {
+        "summary": "Canning Town is an official electoral area in Newham. Commute is measured from the area reference point, reported crime uses a one-mile radius, and rent uses the latest available ONS borough-level average for the selected bedroom count.",
+        "tags": [
+          "Newham",
+          "Official area boundary"
+        ],
+        "source": "GLA ward geography + ONS + Police.uk + TfL"
+      },
+      "complete": false,
+      "sources": {
+        "geography": "Greater London Authority · London Wards (2022)",
+        "crime": "data.police.uk",
+        "commute": null,
+        "rent": "ONS Price Index of Private Rents · local authority by property size",
+        "profile": "GLA ward geography + ONS + Police.uk + TfL"
+      }
+    },
+    {
+      "id": "E05013911",
+      "wardCode": "E05013911",
+      "name": "Forest Gate",
+      "borough": "Newham",
+      "referencePoint": {
+        "name": "Forest Gate area reference point",
+        "lng": 0.024658386133993713,
+        "lat": 51.55206231516749
+      },
+      "destinationPostcode": "W1D 3QW",
+      "arriveBy": "0900",
+      "journeyDate": "20261013",
+      "commute": {
+        "publicTransport": null,
+        "walking": null
+      },
+      "crime": {
+        "month": "2026-08",
+        "total": 903,
+        "radiusMiles": 1,
+        "source": "data.police.uk"
+      },
+      "rentByBedroom": {
+        "1": 1630,
+        "2": 1993,
+        "3": 2212,
+        "4+": 2672
+      },
+      "profile": {
+        "summary": "Forest Gate is an official electoral area in Newham. Commute is measured from the area reference point, reported crime uses a one-mile radius, and rent uses the latest available ONS borough-level average for the selected bedroom count.",
+        "tags": [
+          "Newham",
+          "Official area boundary"
+        ],
+        "source": "GLA ward geography + ONS + Police.uk + TfL"
+      },
+      "complete": false,
+      "sources": {
+        "geography": "Greater London Authority · London Wards (2022)",
+        "crime": "data.police.uk",
+        "commute": null,
+        "rent": "ONS Price Index of Private Rents · local authority by property size",
+        "profile": "GLA ward geography + ONS + Police.uk + TfL"
+      }
+    },
+    {
+      "id": "E05011246",
+      "wardCode": "E05011246",
+      "name": "Ilford",
+      "borough": "Redbridge",
+      "referencePoint": {
+        "name": "Ilford area reference point",
+        "lng": 0.08038664146598673,
+        "lat": 51.56120378105904
+      },
+      "destinationPostcode": "W1D 3QW",
+      "arriveBy": "0900",
+      "journeyDate": "20261013",
+      "commute": {
+        "publicTransport": null,
+        "walking": null
+      },
+      "crime": {
+        "month": "2026-08",
+        "total": 818,
+        "radiusMiles": 1,
+        "source": "data.police.uk"
+      },
+      "rentByBedroom": {
+        "1": 1368,
+        "2": 1681,
+        "3": 1981,
+        "4+": 2711
+      },
+      "profile": {
+        "summary": "Ilford is an official electoral area in Redbridge. Commute is measured from the area reference point, reported crime uses a one-mile radius, and rent uses the latest available ONS borough-level average for the selected bedroom count.",
+        "tags": [
+          "Redbridge",
+          "Official area boundary"
+        ],
+        "source": "GLA ward geography + ONS + Police.uk + TfL"
+      },
+      "complete": false,
+      "sources": {
+        "geography": "Greater London Authority · London Wards (2022)",
+        "crime": "data.police.uk",
+        "commute": null,
+        "rent": "ONS Price Index of Private Rents · local authority by property size",
+        "profile": "GLA ward geography + ONS + Police.uk + TfL"
+      }
+    },
+    {
+      "id": "E05011252",
+      "wardCode": "E05011252",
+      "name": "South Woodford",
+      "borough": "Redbridge",
+      "referencePoint": {
+        "name": "South Woodford area reference point",
+        "lng": 0.025813581292695217,
+        "lat": 51.590260621502544
+      },
+      "destinationPostcode": "W1D 3QW",
+      "arriveBy": "0900",
+      "journeyDate": "20261013",
+      "commute": {
+        "publicTransport": null,
+        "walking": null
+      },
+      "crime": {
+        "month": "2026-08",
+        "total": 251,
+        "radiusMiles": 1,
+        "source": "data.police.uk"
+      },
+      "rentByBedroom": {
+        "1": 1368,
+        "2": 1681,
+        "3": 1981,
+        "4+": 2711
+      },
+      "profile": {
+        "summary": "South Woodford is an official electoral area in Redbridge. Commute is measured from the area reference point, reported crime uses a one-mile radius, and rent uses the latest available ONS borough-level average for the selected bedroom count.",
+        "tags": [
+          "Redbridge",
+          "Official area boundary"
+        ],
+        "source": "GLA ward geography + ONS + Police.uk + TfL"
+      },
+      "complete": false,
+      "sources": {
+        "geography": "Greater London Authority · London Wards (2022)",
+        "crime": "data.police.uk",
+        "commute": null,
+        "rent": "ONS Price Index of Private Rents · local authority by property size",
         "profile": "GLA ward geography + ONS + Police.uk + TfL"
       }
     }
