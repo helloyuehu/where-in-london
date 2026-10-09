@@ -25,9 +25,22 @@ function crimeComparison(total: number, average: number) {
   return `${Math.abs(delta)}% ${delta < 0 ? "below" : "above"} London average`;
 }
 
+function resultState(result: MatchResult) {
+  if (result.allMatch) return "match";
+  if (result.failedCriteria.length === 1) return "near";
+  return "fail";
+}
+
+function statusLabel(result: MatchResult) {
+  if (result.allMatch) return "Matches all";
+  if (result.failedCriteria.length === 1) return `Misses ${result.failedCriteria[0]}`;
+  return `Misses ${result.failedCriteria.length} criteria`;
+}
+
 export function ResultsPanel({ filters, results, selectedId, onSelect }: Props) {
   const matches = results.filter((result) => result.allMatch);
   const nearMatches = results.filter((result) => !result.allMatch && result.failedCriteria.length === 1);
+  const nonMatches = results.filter((result) => result.failedCriteria.length >= 2);
   const londonCrimeAverage = results.length
     ? Math.round(results.reduce((sum, result) => sum + result.area.crime.total, 0) / results.length)
     : 0;
@@ -37,7 +50,8 @@ export function ResultsPanel({ filters, results, selectedId, onSelect }: Props) 
       <div className="resultsHeader">
         <div>
           <p className="eyebrow">London rental fit</p>
-          <h1>{matches.length} areas match</h1>
+          <h1>{matches.length} match</h1>
+          <p className="coverageCopy">{results.length} demo areas evaluated · all London wards shown on map</p>
         </div>
         <span className="demoBadge">V1 · fixture metrics</span>
       </div>
@@ -52,43 +66,82 @@ export function ResultsPanel({ filters, results, selectedId, onSelect }: Props) 
       </div>
 
       <div className="resultsList">
-        {matches.map((result) => (
-          <AreaCard
-            key={result.area.id}
-            result={result}
-            selected={selectedId === result.area.id}
-            onSelect={() => onSelect(result.area.id)}
-            londonCrimeAverage={londonCrimeAverage}
-          />
-        ))}
+        <ResultSection
+          title="Matches"
+          detail="Meets every active constraint"
+          results={matches}
+          selectedId={selectedId}
+          onSelect={onSelect}
+          londonCrimeAverage={londonCrimeAverage}
+        />
 
         {matches.length === 0 && (
           <div className="emptyState">
             <strong>No exact matches</strong>
-            <p>Try widening one constraint. The closest results are shown below.</p>
+            <p>Try widening one constraint. Almost matches are shown below.</p>
           </div>
         )}
 
-        {nearMatches.length > 0 && (
-          <div className="nearMatchSection">
-            <div className="sectionHeading">
-              <span>Almost matches</span>
-              <small>Misses one criterion</small>
-            </div>
-            {nearMatches.slice(0, 6).map((result) => (
-              <AreaCard
-                key={result.area.id}
-                result={result}
-                selected={selectedId === result.area.id}
-                onSelect={() => onSelect(result.area.id)}
-                compact
-                londonCrimeAverage={londonCrimeAverage}
-              />
-            ))}
-          </div>
-        )}
+        <ResultSection
+          title="Almost matches"
+          detail="Misses one criterion"
+          results={nearMatches}
+          selectedId={selectedId}
+          onSelect={onSelect}
+          londonCrimeAverage={londonCrimeAverage}
+          compact
+        />
+
+        <ResultSection
+          title="Doesn’t match"
+          detail="Misses two or more criteria"
+          results={nonMatches}
+          selectedId={selectedId}
+          onSelect={onSelect}
+          londonCrimeAverage={londonCrimeAverage}
+          compact
+        />
       </div>
     </aside>
+  );
+}
+
+function ResultSection({
+  title,
+  detail,
+  results,
+  selectedId,
+  onSelect,
+  londonCrimeAverage,
+  compact = false,
+}: {
+  title: string;
+  detail: string;
+  results: MatchResult[];
+  selectedId: string | null;
+  onSelect: (id: string) => void;
+  londonCrimeAverage: number;
+  compact?: boolean;
+}) {
+  if (!results.length) return null;
+
+  return (
+    <section className="resultSection">
+      <div className="sectionHeading">
+        <span>{title} <b>{results.length}</b></span>
+        <small>{detail}</small>
+      </div>
+      {results.map((result) => (
+        <AreaCard
+          key={result.area.id}
+          result={result}
+          selected={selectedId === result.area.id}
+          onSelect={() => onSelect(result.area.id)}
+          compact={compact}
+          londonCrimeAverage={londonCrimeAverage}
+        />
+      ))}
+    </section>
   );
 }
 
@@ -108,32 +161,33 @@ function AreaCard({
   const { area } = result;
   const transit = area.commute.publicTransport;
   const route = transit.legs?.map(routeLabel).join(" → ");
+  const state = resultState(result);
 
   return (
-    <button type="button" onClick={onSelect} className={`areaCard ${selected ? "selected" : ""}`}>
+    <button type="button" onClick={onSelect} className={`areaCard ${state} ${selected ? "selected" : ""}`}>
       <div className="cardTopline">
         <div>
           <h2>{area.name}</h2>
           <p>{area.borough}</p>
         </div>
-        <span className={`matchPill ${result.allMatch ? "match" : "near"}`}>{result.allMatch ? "Matches" : `Misses ${result.failedCriteria[0]}`}</span>
+        <span className={`matchPill ${state}`}>{statusLabel(result)}</span>
       </div>
 
       {!compact && <p className="areaSummary">{area.profile.summary}</p>}
 
       <div className="metricGrid">
-        <div className={result.commuteMatches ? "metric" : "metric fail"}>
-          <span>Commute</span>
+        <div className={`metric ${result.commuteMatches ? "pass" : "fail"}`}>
+          <span>{result.commuteMatches ? "✓" : "✕"} Commute</span>
           <strong>{transit.minutes} min</strong>
           <small>transit · walk {area.commute.walking.minutes} min</small>
         </div>
-        <div className={result.rentMatches ? "metric" : "metric fail"}>
-          <span>Rent</span>
+        <div className={`metric ${result.rentMatches ? "pass" : "fail"}`}>
+          <span>{result.rentMatches ? "✓" : "✕"} Rent</span>
           <strong>{money(result.rent)}</strong>
           <small>/ month · selected bed</small>
         </div>
-        <div className={result.crimeMatches ? "metric" : "metric fail"}>
-          <span>Reported crime</span>
+        <div className={`metric ${result.crimeMatches ? "pass" : "fail"}`}>
+          <span>{result.crimeMatches ? "✓" : "✕"} Reported crime</span>
           <strong>{area.crime.total}</strong>
           <small>{crimeComparison(area.crime.total, londonCrimeAverage)}</small>
         </div>
