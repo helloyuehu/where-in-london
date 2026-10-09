@@ -33,6 +33,48 @@ function wardCode(feature: Feature<Geometry>) {
   return String(feature.properties?.ward_code || "");
 }
 
+function geometryCentre(geometry: Geometry) {
+  let minLng = Infinity;
+  let minLat = Infinity;
+  let maxLng = -Infinity;
+  let maxLat = -Infinity;
+
+  const visit = (value: unknown) => {
+    if (!Array.isArray(value)) return;
+    if (value.length >= 2 && typeof value[0] === "number" && typeof value[1] === "number") {
+      const lng = value[0];
+      const lat = value[1];
+      minLng = Math.min(minLng, lng);
+      maxLng = Math.max(maxLng, lng);
+      minLat = Math.min(minLat, lat);
+      maxLat = Math.max(maxLat, lat);
+      return;
+    }
+    value.forEach(visit);
+  };
+
+  visit((geometry as any).coordinates);
+  if (!Number.isFinite(minLng)) return { lng: -0.1276, lat: 51.5072 };
+  return { lng: (minLng + maxLng) / 2, lat: (minLat + maxLat) / 2 };
+}
+
+function nearestResult(feature: Feature<Geometry>, results: MatchResult[]) {
+  if (!results.length) return undefined;
+  const centre = geometryCentre(feature.geometry);
+  let nearest = results[0];
+  let best = Infinity;
+  for (const result of results) {
+    const dx = (centre.lng - result.area.referencePoint.lng) * 0.63;
+    const dy = centre.lat - result.area.referencePoint.lat;
+    const distance = dx * dx + dy * dy;
+    if (distance < best) {
+      best = distance;
+      nearest = result;
+    }
+  }
+  return nearest;
+}
+
 function decorateWards(
   wards: FeatureCollection<Geometry>,
   results: MatchResult[],
@@ -43,16 +85,18 @@ function decorateWards(
     type: "FeatureCollection",
     features: wards.features.map((feature) => {
       const code = wardCode(feature);
-      const result = byCode.get(code);
+      const anchor = byCode.get(code);
+      const result = anchor || nearestResult(feature, results);
       return {
         ...feature,
         properties: {
           ...(feature.properties ?? {}),
-          id: code,
+          id: result?.area.id || code,
           name: result?.area.name || feature.properties?.ward_name || code,
           state: result?.state || "context",
           dataStatus: result?.area.dataStatus || "context",
           inModel: Boolean(result),
+          isAnchor: Boolean(anchor),
         },
       };
     }),
@@ -82,7 +126,7 @@ export function LondonMap({ results, selectedId, onSelect, destinationPostcode }
   const [wardCount, setWardCount] = useState<number | null>(null);
 
   const resultSignature = useMemo(
-    () => results.map((result) => `${result.area.wardCode}:${result.state}`).join("|"),
+    () => results.map((result) => `${result.area.id}:${result.state}`).join("|"),
     [results],
   );
 
@@ -102,7 +146,6 @@ export function LondonMap({ results, selectedId, onSelect, destinationPostcode }
         const location = (await response.json()) as WorkLocation;
         workLocationRef.current = location;
         setWorkLocation(location);
-
         const map = mapRef.current;
         if (map?.isStyleLoaded()) {
           const source = map.getSource("work-location") as GeoJSONSource | undefined;
@@ -168,24 +211,20 @@ export function LondonMap({ results, selectedId, onSelect, destinationPostcode }
           source: "london-wards",
           paint: {
             "fill-color": [
-              "match",
-              ["get", "state"],
+              "match", ["get", "state"],
               "match", "#16855b",
               "near", "#e39a2d",
               "fail", "#8f98a3",
               "pending", "#d9e0e7",
-              "context", "#f5f6f7",
               "#f5f6f7",
             ],
             "fill-opacity": [
-              "match",
-              ["get", "state"],
-              "match", 0.82,
-              "near", 0.76,
-              "fail", 0.68,
-              "pending", 0.76,
-              "context", 0.42,
-              0.42,
+              "match", ["get", "state"],
+              "match", 0.78,
+              "near", 0.70,
+              "fail", 0.58,
+              "pending", 0.62,
+              0.40,
             ],
           },
         });
@@ -195,31 +234,9 @@ export function LondonMap({ results, selectedId, onSelect, destinationPostcode }
           type: "line",
           source: "london-wards",
           paint: {
-            "line-color": [
-              "match",
-              ["get", "state"],
-              "match", "#0c6442",
-              "near", "#a96600",
-              "fail", "#66717d",
-              "pending", "#8d99a6",
-              "context", "#d8dde2",
-              "#d8dde2",
-            ],
-            "line-opacity": [
-              "case",
-              ["boolean", ["get", "inModel"], false],
-              0.96,
-              0.62,
-            ],
-            "line-width": [
-              "interpolate",
-              ["linear"],
-              ["zoom"],
-              8.4,
-              ["case", ["boolean", ["get", "inModel"], false], 1.05, 0.45],
-              12,
-              ["case", ["boolean", ["get", "inModel"], false], 1.7, 0.8],
-            ],
+            "line-color": "#ffffff",
+            "line-opacity": 0.28,
+            "line-width": ["interpolate", ["linear"], ["zoom"], 8.4, 0.35, 12, 0.65],
           },
         });
 
@@ -227,17 +244,17 @@ export function LondonMap({ results, selectedId, onSelect, destinationPostcode }
           id: "london-ward-labels",
           type: "symbol",
           source: "london-wards",
-          minzoom: 9.35,
-          filter: ["==", ["get", "inModel"], true],
+          minzoom: 9.15,
+          filter: ["==", ["get", "isAnchor"], true],
           layout: {
             "text-field": ["get", "name"],
-            "text-size": ["interpolate", ["linear"], ["zoom"], 9.35, 9, 13, 12],
+            "text-size": ["interpolate", ["linear"], ["zoom"], 9.15, 9, 13, 12],
             "text-allow-overlap": false,
-            "text-padding": 3,
+            "text-padding": 4,
           },
           paint: {
             "text-color": "#242a30",
-            "text-halo-color": "rgba(255,255,255,0.95)",
+            "text-halo-color": "rgba(255,255,255,0.96)",
             "text-halo-width": 1.5,
           },
         });
@@ -249,8 +266,8 @@ export function LondonMap({ results, selectedId, onSelect, destinationPostcode }
           filter: ["==", ["get", "id"], selectedId || "__none__"],
           paint: {
             "line-color": "#101214",
-            "line-width": 3.5,
-            "line-opacity": 1,
+            "line-width": 2.6,
+            "line-opacity": 0.95,
           },
         });
 
@@ -265,22 +282,13 @@ export function LondonMap({ results, selectedId, onSelect, destinationPostcode }
           id: "work-pin-halo",
           type: "circle",
           source: "work-location",
-          paint: {
-            "circle-radius": 13,
-            "circle-color": "rgba(255,255,255,0.72)",
-            "circle-stroke-width": 0,
-          },
+          paint: { "circle-radius": 13, "circle-color": "rgba(255,255,255,0.72)", "circle-stroke-width": 0 },
         });
         map.addLayer({
           id: "work-pin",
           type: "circle",
           source: "work-location",
-          paint: {
-            "circle-radius": 7,
-            "circle-color": "#111111",
-            "circle-stroke-color": "#ffffff",
-            "circle-stroke-width": 3,
-          },
+          paint: { "circle-radius": 7, "circle-color": "#111111", "circle-stroke-color": "#ffffff", "circle-stroke-width": 3 },
         });
         map.addLayer({
           id: "work-label",
@@ -293,23 +301,14 @@ export function LondonMap({ results, selectedId, onSelect, destinationPostcode }
             "text-anchor": "top",
             "text-allow-overlap": true,
           },
-          paint: {
-            "text-color": "#111111",
-            "text-halo-color": "#ffffff",
-            "text-halo-width": 2,
-          },
+          paint: { "text-color": "#111111", "text-halo-color": "#ffffff", "text-halo-width": 2 },
         });
 
-        map.on("mouseenter", "london-wards-fill", (event) => {
-          const inModel = Boolean(event.features?.[0]?.properties?.inModel);
-          map.getCanvas().style.cursor = inModel ? "pointer" : "";
-        });
+        map.on("mouseenter", "london-wards-fill", () => { map.getCanvas().style.cursor = "pointer"; });
         map.on("mouseleave", "london-wards-fill", () => { map.getCanvas().style.cursor = ""; });
         map.on("click", "london-wards-fill", (event) => {
-          const feature = event.features?.[0];
-          const id = feature?.properties?.id;
-          const inModel = Boolean(feature?.properties?.inModel);
-          if (inModel && typeof id === "string" && id) onSelect(id);
+          const id = event.features?.[0]?.properties?.id;
+          if (typeof id === "string" && id) onSelect(id);
         });
 
         const workSource = map.getSource("work-location") as GeoJSONSource | undefined;
@@ -322,11 +321,8 @@ export function LondonMap({ results, selectedId, onSelect, destinationPostcode }
       }
     });
 
-    const resizeObserver = typeof ResizeObserver !== "undefined"
-      ? new ResizeObserver(() => map.resize())
-      : null;
+    const resizeObserver = typeof ResizeObserver !== "undefined" ? new ResizeObserver(() => map.resize()) : null;
     resizeObserver?.observe(container);
-
     const handleWindowResize = () => map.resize();
     window.addEventListener("resize", handleWindowResize);
 
@@ -351,14 +347,13 @@ export function LondonMap({ results, selectedId, onSelect, destinationPostcode }
     const map = mapRef.current;
     if (!map || !map.isStyleLoaded() || !map.getLayer("selected-ward-line")) return;
     map.setFilter("selected-ward-line", ["==", ["get", "id"], selectedId || "__none__"]);
-
     if (!selectedId) return;
     const selected = results.find((result) => result.area.id === selectedId);
     if (!selected) return;
     map.easeTo({
       center: [selected.area.referencePoint.lng, selected.area.referencePoint.lat],
-      zoom: Math.max(map.getZoom(), 11),
-      duration: 420,
+      zoom: Math.max(map.getZoom(), 10.6),
+      duration: 350,
     });
   }, [selectedId, results]);
 
@@ -372,27 +367,25 @@ export function LondonMap({ results, selectedId, onSelect, destinationPostcode }
   const matches = results.filter((result) => result.state === "match").length;
   const almost = results.filter((result) => result.state === "near").length;
   const noMatch = results.filter((result) => result.state === "fail").length;
-  const pending = results.filter((result) => result.state === "pending").length;
 
   return (
     <div className="mapShell">
       <div ref={containerRef} className="mapCanvas" aria-label="Greater London area map" />
 
       <div className="mapCoverageBadge">
-        <strong>{results.length || "…"} decision areas</strong>
-        <span>{wardCount ? `${wardCount} official wards kept as London context` : "Loading London context…"}</span>
+        <strong>{results.length || "…"} London living areas</strong>
+        <span>{wardCount ? `${wardCount} official wards grouped to cover the whole city` : "Loading London coverage…"}</span>
       </div>
 
       <div className="mapLegend">
         <span><i className="legendSwatch match" />Match <b>{matches}</b></span>
         <span><i className="legendSwatch near" />Almost <b>{almost}</b></span>
         <span><i className="legendSwatch fail" />Doesn’t match <b>{noMatch}</b></span>
-        {pending > 0 && <span><i className="legendSwatch unevaluated" />Checking <b>{pending}</b></span>}
         <span><i className="legendDot work" />Work</span>
       </div>
 
       <div className="geographyNote">
-        {geographyStatus === "ready" && "Representative neighbourhood-scale areas use official ward polygons. Other London wards stay visible as geographic context."}
+        {geographyStatus === "ready" && "The 80 decision areas are expanded across neighbouring official wards so the whole of Greater London is covered without gaps."}
         {geographyStatus === "loading" && "Loading Greater London geography…"}
         {geographyStatus === "fallback" && "Official London geography is temporarily unavailable."}
       </div>
