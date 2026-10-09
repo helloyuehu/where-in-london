@@ -212,10 +212,13 @@ export function LondonMap({ results, selectedId, onSelect, destinationPostcode }
               0.62,
             ],
             "line-width": [
-              "case",
-              ["boolean", ["get", "inModel"], false],
-              ["interpolate", ["linear"], ["zoom"], 8.4, 1.05, 12, 1.7],
-              ["interpolate", ["linear"], ["zoom"], 8.4, 0.45, 12, 0.8],
+              "interpolate",
+              ["linear"],
+              ["zoom"],
+              8.4,
+              ["case", ["boolean", ["get", "inModel"], false], 1.05, 0.45],
+              12,
+              ["case", ["boolean", ["get", "inModel"], false], 1.7, 0.8],
             ],
           },
         });
