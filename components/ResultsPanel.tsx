@@ -238,7 +238,7 @@ function AreaCard({
 
       {!compact && area.profile.tags.length > 0 && (
         <div className="tagRow">
-          {area.profile.tags.map((tag) => <span key={tag}>{tag}</span>}
+          {area.profile.tags.map((tag) => <span key={tag}>{tag}</span>)}
         </div>
       )}
     </button>
