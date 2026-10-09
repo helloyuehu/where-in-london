@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { FilterBar } from "@/components/FilterBar";
 import { LondonMap } from "@/components/LondonMap";
 import { ResultsPanel } from "@/components/ResultsPanel";
@@ -21,17 +21,41 @@ const initialFilters: FilterState = {
 type AreasPayload = {
   areas?: LondonArea[];
   generatedAt?: string | null;
-  metricsDestinationPostcode?: string | null;
 };
 
-type CommutePayload = LondonArea["commute"] & { error?: string };
+type DestinationPoint = {
+  lat: number;
+  lng: number;
+};
 
-function normalisePostcode(value: string) {
-  return value.replace(/\s+/g, "").toUpperCase();
+const DEFAULT_WORK_POINT: DestinationPoint = { lat: 51.5136, lng: -0.1311 };
+
+function haversineKm(a: DestinationPoint, b: DestinationPoint) {
+  const radiusKm = 6371;
+  const toRad = (value: number) => value * Math.PI / 180;
+  const dLat = toRad(b.lat - a.lat);
+  const dLng = toRad(b.lng - a.lng);
+  const lat1 = toRad(a.lat);
+  const lat2 = toRad(b.lat);
+  const h = Math.sin(dLat / 2) ** 2
+    + Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLng / 2) ** 2;
+  return 2 * radiusKm * Math.asin(Math.sqrt(h));
 }
 
-function commuteKey(area: LondonArea, postcode: string, arriveBy: string, travelModeSignature: string) {
-  return `${area.id}|${normalisePostcode(postcode)}|${arriveBy}|${travelModeSignature}`;
+function estimatedCommute(area: LondonArea, destination: DestinationPoint): LondonArea["commute"] {
+  const origin = { lat: area.referencePoint.lat, lng: area.referencePoint.lng };
+  const directKm = haversineKm(origin, destination);
+  const transitKm = directKm * 1.25;
+  const walkingKm = directKm * 1.12;
+
+  return {
+    publicTransport: {
+      minutes: Math.max(8, Math.round(8 + (transitKm / 24) * 60)),
+    },
+    walking: {
+      minutes: Math.max(1, Math.round((walkingKm / 4.8) * 60)),
+    },
+  };
 }
 
 export default function Home() {
@@ -39,17 +63,8 @@ export default function Home() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [areas, setAreas] = useState<LondonArea[]>([]);
   const [isLoadingAreas, setIsLoadingAreas] = useState(true);
-  const [metricsDestinationPostcode, setMetricsDestinationPostcode] = useState<string | null>(null);
   const [generatedAt, setGeneratedAt] = useState<string | null>(null);
-  const [runtimeCommutes, setRuntimeCommutes] = useState<Record<string, LondonArea["commute"]>>({});
-  const [commuteLoadingCount, setCommuteLoadingCount] = useState(0);
-  const [commuteErrorCount, setCommuteErrorCount] = useState(0);
-  const commuteCacheRef = useRef(new Map<string, LondonArea["commute"]>());
-
-  const travelModeSignature = useMemo(
-    () => [...filters.travelModes].sort().join(","),
-    [filters.travelModes],
-  );
+  const [destinationPoint, setDestinationPoint] = useState<DestinationPoint>(DEFAULT_WORK_POINT);
 
   useEffect(() => {
     let cancelled = false;
@@ -63,7 +78,6 @@ export default function Home() {
       .then((payload) => {
         if (cancelled) return;
         setAreas(Array.isArray(payload.areas) ? payload.areas : []);
-        setMetricsDestinationPostcode(payload.metricsDestinationPostcode || null);
         setGeneratedAt(payload.generatedAt || null);
       })
       .catch(() => {
@@ -76,139 +90,58 @@ export default function Home() {
     return () => { cancelled = true; };
   }, []);
 
-  const destinationChanged = Boolean(
-    metricsDestinationPostcode
-    && normalisePostcode(metricsDestinationPostcode) !== normalisePostcode(filters.destinationPostcode),
-  );
-
-  const staticCandidates = useMemo(() => areas.filter((area) => {
-    const rent = getRent(area, filters.bedroom);
-    if (rent === null || !area.crime) return false;
-    const rentPasses = rent >= filters.rentMin && rent <= filters.rentMax;
-    const crimePasses = area.crime.total <= filters.maxCrime;
-    return rentPasses && crimePasses;
-  }), [areas, filters.bedroom, filters.rentMin, filters.rentMax, filters.maxCrime]);
-
-  const staticCandidateSignature = useMemo(
-    () => staticCandidates.map((area) => area.id).sort().join("|"),
-    [staticCandidates],
-  );
-
-  useEffect(() => {
-    setRuntimeCommutes({});
-    setCommuteErrorCount(0);
-  }, [filters.destinationPostcode, filters.arriveBy, travelModeSignature]);
-
   useEffect(() => {
     const postcode = filters.destinationPostcode.trim();
-    if (!postcode || filters.travelModes.length === 0 || staticCandidates.length === 0) {
-      setCommuteLoadingCount(0);
-      return;
-    }
+    if (!postcode) return;
 
     const controller = new AbortController();
-    let cancelled = false;
-
-    const pending = staticCandidates.filter((area) => {
-      const cached = commuteCacheRef.current.get(commuteKey(area, postcode, filters.arriveBy, travelModeSignature));
-      if (cached) return false;
-      if (destinationChanged) return true;
-      return filters.travelModes.some((mode) => !area.commute[mode]);
-    });
-
-    const cachedUpdates: Record<string, LondonArea["commute"]> = {};
-    for (const area of staticCandidates) {
-      const cached = commuteCacheRef.current.get(commuteKey(area, postcode, filters.arriveBy, travelModeSignature));
-      if (cached) cachedUpdates[area.id] = cached;
-    }
-    if (Object.keys(cachedUpdates).length) {
-      setRuntimeCommutes((current) => ({ ...current, ...cachedUpdates }));
-    }
-
-    if (!pending.length) {
-      setCommuteLoadingCount(0);
-      return () => controller.abort();
-    }
-
-    setCommuteLoadingCount(pending.length);
-    setCommuteErrorCount(0);
-    let cursor = 0;
-
-    const worker = async () => {
-      while (!cancelled) {
-        const index = cursor++;
-        if (index >= pending.length) return;
-        const area = pending[index];
-        const params = new URLSearchParams({
-          lat: String(area.referencePoint.lat),
-          lng: String(area.referencePoint.lng),
-          destination: postcode,
-          arriveBy: filters.arriveBy,
-          modes: travelModeSignature,
+    const timer = window.setTimeout(async () => {
+      try {
+        const response = await fetch(`/api/postcode?postcode=${encodeURIComponent(postcode)}`, {
+          signal: controller.signal,
+          cache: "no-store",
         });
-
-        try {
-          const response = await fetch(`/api/commute?${params.toString()}`, {
-            signal: controller.signal,
-            cache: "no-store",
-          });
-          if (!response.ok) throw new Error("Commute lookup failed");
-          const payload = await response.json() as CommutePayload;
-          const commute = {
-            publicTransport: payload.publicTransport || null,
-            walking: payload.walking || null,
-          };
-          commuteCacheRef.current.set(
-            commuteKey(area, postcode, filters.arriveBy, travelModeSignature),
-            commute,
-          );
-          if (!cancelled) {
-            setRuntimeCommutes((current) => ({ ...current, [area.id]: commute }));
-          }
-        } catch {
-          if (!controller.signal.aborted && !cancelled) {
-            setCommuteErrorCount((count) => count + 1);
-          }
-        } finally {
-          if (!cancelled) setCommuteLoadingCount((count) => Math.max(0, count - 1));
+        if (!response.ok) throw new Error("Postcode lookup failed");
+        const payload = await response.json() as { lat: number; lng: number };
+        if (Number.isFinite(payload.lat) && Number.isFinite(payload.lng)) {
+          setDestinationPoint({ lat: payload.lat, lng: payload.lng });
+        }
+      } catch {
+        if (!controller.signal.aborted && postcode.replace(/\s+/g, "").toUpperCase() === "W1D3QW") {
+          setDestinationPoint(DEFAULT_WORK_POINT);
         }
       }
-    };
-
-    void Promise.all(Array.from({ length: Math.min(2, pending.length) }, () => worker()));
+    }, 250);
 
     return () => {
-      cancelled = true;
+      window.clearTimeout(timer);
       controller.abort();
     };
-  }, [
-    staticCandidateSignature,
-    filters.destinationPostcode,
-    filters.arriveBy,
-    travelModeSignature,
-    destinationChanged,
-  ]);
+  }, [filters.destinationPostcode]);
 
-  const effectiveAreas = useMemo(() => areas.map((area) => {
-    const base = destinationChanged
-      ? { ...area, commute: { publicTransport: null, walking: null } }
-      : area;
-    const runtime = runtimeCommutes[area.id];
-    return runtime ? { ...base, commute: runtime } : base;
-  }), [areas, destinationChanged, runtimeCommutes]);
+  const effectiveAreas = useMemo(
+    () => areas.map((area) => ({
+      ...area,
+      commute: estimatedCommute(area, destinationPoint),
+    })),
+    [areas, destinationPoint],
+  );
 
   const results = useMemo(
     () => rankResults(effectiveAreas.map((area) => evaluateArea(area, filters))),
     [effectiveAreas, filters],
   );
 
-  const factsReadyCount = areas.filter((area) => area.dataStatus === "ready").length;
-  const effectiveById = useMemo(() => new Map(effectiveAreas.map((area) => [area.id, area])), [effectiveAreas]);
-  const commuteCheckedCount = staticCandidates.filter((area) => {
-    const effective = effectiveById.get(area.id);
-    if (!effective) return false;
-    return filters.travelModes.every((mode) => Boolean(effective.commute[mode]));
-  }).length;
+  const staticCandidates = useMemo(() => effectiveAreas.filter((area) => {
+    const rent = getRent(area, filters.bedroom);
+    if (rent === null || !area.crime) return false;
+    return rent >= filters.rentMin
+      && rent <= filters.rentMax
+      && area.crime.total <= filters.maxCrime;
+  }), [effectiveAreas, filters.bedroom, filters.rentMin, filters.rentMax, filters.maxCrime]);
+
+  const factsReadyCount = areas.filter((area) => area.crime && area.rentByBedroom).length;
+  const commuteCheckedCount = staticCandidates.length;
 
   const londonCrimeAverage = useMemo(() => {
     const totals = areas.flatMap((area) => area.crime ? [area.crime.total] : []);
@@ -227,7 +160,7 @@ export default function Home() {
           </div>
         </div>
         <div className="methodNote">
-          {areas.length ? `${areas.length} representative London areas` : "Representative London areas"} · official ward polygons · no combined score
+          {areas.length ? `${areas.length} representative London areas` : "Representative London areas"} · official ward polygons · instant commute estimate
         </div>
       </header>
 
@@ -253,8 +186,8 @@ export default function Home() {
           factsReadyCount={factsReadyCount}
           candidateCount={staticCandidates.length}
           commuteCheckedCount={commuteCheckedCount}
-          commuteLoadingCount={commuteLoadingCount}
-          commuteErrorCount={commuteErrorCount}
+          commuteLoadingCount={0}
+          commuteErrorCount={0}
           generatedAt={generatedAt}
         />
       </div>
