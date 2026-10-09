@@ -15,7 +15,7 @@ const initialFilters: FilterState = {
   rentMin: 1500,
   rentMax: 2600,
   bedroom: 1,
-  maxCrime: 99,
+  maxCrime: 299,
 };
 
 type AreasPayload = {
