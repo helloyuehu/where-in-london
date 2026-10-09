@@ -61,7 +61,7 @@ export function ResultsPanel({
 
   return (
     <aside className="resultsPanel">
-      <div className="resultsHeader">
+      <div className="resultsHeader" style={{ paddingTop: 20, paddingBottom: 16 }}>
         <h1>{heading}</h1>
       </div>
 
