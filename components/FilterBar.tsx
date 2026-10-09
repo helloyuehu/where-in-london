@@ -6,14 +6,12 @@ import type { BedroomOption, FilterState, TravelMode } from "@/lib/types";
 type Props = {
   filters: FilterState;
   onChange: (next: FilterState) => void;
-  onApply: () => void;
-  isDirty: boolean;
   londonCrimeAverage: number | null;
 };
 
 const bedroomOptions: BedroomOption[] = [1, 2, 3, "4+"];
 
-export function FilterBar({ filters, onChange, onApply, isDirty, londonCrimeAverage }: Props) {
+export function FilterBar({ filters, onChange, londonCrimeAverage }: Props) {
   const [mobileExpanded, setMobileExpanded] = useState(false);
 
   const update = <K extends keyof FilterState>(key: K, value: FilterState[K]) => {
@@ -25,11 +23,6 @@ export function FilterBar({ filters, onChange, onApply, isDirty, londonCrimeAver
     update("travelModes", has ? filters.travelModes.filter((item) => item !== mode) : [...filters.travelModes, mode]);
   };
 
-  const apply = () => {
-    onApply();
-    setMobileExpanded(false);
-  };
-
   return (
     <div className={`filterShell${mobileExpanded ? " filtersExpanded" : ""}`}>
       <button
@@ -38,7 +31,7 @@ export function FilterBar({ filters, onChange, onApply, isDirty, londonCrimeAver
         onClick={() => setMobileExpanded((expanded) => !expanded)}
         aria-expanded={mobileExpanded}
       >
-        <span className="filterMobileTitle">Filters{isDirty ? " · edited" : ""}</span>
+        <span className="filterMobileTitle">Filters</span>
         <span className="filterMobileSummary">
           {filters.destinationPostcode || "Postcode"} · £{filters.rentMin.toLocaleString()}–£{filters.rentMax.toLocaleString()} · {filters.bedroom} bed
         </span>
@@ -140,11 +133,6 @@ export function FilterBar({ filters, onChange, onApply, isDirty, londonCrimeAver
         </div>
       </section>
 
-      <div className="filterActionRow">
-        <span>{isDirty ? "Filters changed" : "Results are up to date"}</span>
-        <button type="button" onClick={apply} disabled={!isDirty}>Update results</button>
-      </div>
-
       <style jsx global>{`
         .filterShell {
           background: #fff;
@@ -153,35 +141,6 @@ export function FilterBar({ filters, onChange, onApply, isDirty, londonCrimeAver
         .filterShell .filterBar {
           border-bottom: 0;
           overflow-y: visible;
-        }
-        .filterActionRow {
-          min-height: 44px;
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          gap: 12px;
-          padding: 6px 16px 10px;
-          background: #fff;
-        }
-        .filterActionRow > span {
-          font-size: 10px;
-          color: var(--muted);
-        }
-        .filterActionRow button {
-          height: 36px;
-          border: 0;
-          border-radius: 9px;
-          padding: 0 16px;
-          background: #17191c;
-          color: #fff;
-          font-size: 12px;
-          font-weight: 700;
-          white-space: nowrap;
-          cursor: pointer;
-        }
-        .filterActionRow button:disabled {
-          opacity: .35;
-          cursor: default;
         }
         .filterMobileToggle {
           display: none;
@@ -216,8 +175,7 @@ export function FilterBar({ filters, onChange, onApply, isDirty, londonCrimeAver
             color: var(--muted);
             font-size: 9px;
           }
-          .filterShell:not(.filtersExpanded) .filterBar,
-          .filterShell:not(.filtersExpanded) .filterActionRow {
+          .filterShell:not(.filtersExpanded) .filterBar {
             display: none !important;
           }
           .filterShell.filtersExpanded .filterBar {
@@ -230,14 +188,6 @@ export function FilterBar({ filters, onChange, onApply, isDirty, londonCrimeAver
           .filterShell.filtersExpanded .filterBar > .filterGroup {
             flex: 1 0 100% !important;
             min-width: 0 !important;
-          }
-          .filterShell.filtersExpanded .filterActionRow {
-            display: flex !important;
-            padding: 8px 14px 10px;
-            border-top: 1px solid var(--border);
-          }
-          .filterShell.filtersExpanded .filterActionRow button {
-            height: 38px;
           }
         }
       `}</style>
