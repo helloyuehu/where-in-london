@@ -1,6 +1,6 @@
 "use client";
 
-import type { FilterState, MatchResult, RouteLeg } from "@/lib/types";
+import type { FilterState, MatchResult } from "@/lib/types";
 
 type Props = {
   filters: FilterState;
@@ -16,11 +16,6 @@ type Props = {
   generatedAt: string | null;
 };
 
-function routeLabel(leg: RouteLeg) {
-  if (leg.mode === "walk") return `Walk ${leg.minutes}m`;
-  return `${leg.line ?? leg.mode} ${leg.minutes}m`;
-}
-
 function money(value: number | null) {
   return value === null ? "Pending" : `£${value.toLocaleString("en-GB")}`;
 }
@@ -29,7 +24,6 @@ function statusLabel(result: MatchResult) {
   if (result.state === "match") return "Matches all";
   if (result.state === "near") return `Misses ${result.failedCriteria[0]}`;
   if (result.state === "fail") return `Misses ${result.failedCriteria.length} criteria`;
-  if (result.missingCriteria.length === 1 && result.missingCriteria[0] === "commute") return "Checking commute";
   return `Waiting for ${result.missingCriteria.join(", ") || "data"}`;
 }
 
@@ -49,8 +43,6 @@ export function ResultsPanel({
   factsReadyCount,
   candidateCount,
   commuteCheckedCount,
-  commuteLoadingCount,
-  commuteErrorCount,
   generatedAt,
 }: Props) {
   const matches = results.filter((result) => result.state === "match");
@@ -64,9 +56,7 @@ export function ResultsPanel({
     ? "Loading London…"
     : factsLoading
       ? "Loading rent + crime…"
-      : commuteLoadingCount > 0
-        ? `${matches.length} matches · checking commutes`
-        : `${matches.length} ${matches.length === 1 ? "area matches" : "areas match"}`;
+      : `${matches.length} ${matches.length === 1 ? "area matches" : "areas match"}`;
 
   return (
     <aside className="resultsPanel">
@@ -76,19 +66,17 @@ export function ResultsPanel({
           <h1>{heading}</h1>
           <p className="coverageCopy">
             {results.length > 0
-              ? `${results.length} representative areas · ${factsReadyCount} have rent + crime${factsReadyCount > 0 ? ` · ${candidateCount} pass those filters · ${commuteCheckedCount}/${candidateCount} commutes checked` : ""}`
+              ? `${results.length} representative areas · ${factsReadyCount} have rent + crime · ${candidateCount} pass rent + crime · ${commuteCheckedCount} commute estimates ready`
               : "Loading representative London areas…"}
           </p>
-          {commuteErrorCount > 0 && (
-            <p className="coverageCopy">{commuteErrorCount} commute lookups could not be resolved yet; other results continue loading.</p>
-          )}
+          <p className="coverageCopy">Commute is an instant distance-based estimate for this prototype, so results never wait on TfL.</p>
         </div>
-        <span className="demoBadge live">Official boundaries</span>
+        <span className="demoBadge live">Usable prototype</span>
       </div>
 
       <div className="summaryChips" aria-label="Active filters">
         <span>≤ {filters.maxCommuteMinutes} min to {filters.destinationPostcode || "work"}</span>
-        <span>{filters.travelModes.includes("publicTransport") ? "Transit" : ""}{filters.travelModes.length === 2 ? " + " : ""}{filters.travelModes.includes("walking") ? "Walk" : ""}</span>
+        <span>{filters.travelModes.includes("publicTransport") ? "Transit estimate" : ""}{filters.travelModes.length === 2 ? " + " : ""}{filters.travelModes.includes("walking") ? "Walk estimate" : ""}</span>
         <span>£{filters.rentMin.toLocaleString("en-GB")}–£{filters.rentMax.toLocaleString("en-GB")}</span>
         <span>{String(filters.bedroom) === "studio" ? "Studio" : `${filters.bedroom} bed`}</span>
         <span>≤ {filters.maxCrime === 9999 ? "Any" : filters.maxCrime} crimes / month</span>
@@ -99,7 +87,7 @@ export function ResultsPanel({
         {factsLoading && (
           <div className="emptyState">
             <strong>Area boundaries and profiles are ready</strong>
-            <p>Rent and reported-crime facts are refreshing for the smaller 80-area model. Commute is no longer precomputed for every London ward.</p>
+            <p>Rent and reported-crime facts are still loading.</p>
           </div>
         )}
 
@@ -128,8 +116,8 @@ export function ResultsPanel({
         />
 
         <ResultSection
-          title="Checking commute"
-          detail="Passed rent + crime; TfL commute is calculated only for candidates"
+          title="Incomplete data"
+          detail="One or more inputs are unavailable"
           results={pending}
           selectedId={selectedId}
           onSelect={onSelect}
@@ -221,7 +209,6 @@ function AreaCard({
   const { area } = result;
   const transit = area.commute.publicTransport;
   const walking = area.commute.walking;
-  const route = transit?.legs?.map(routeLabel).join(" → ");
   const crime = area.crime;
   const boundary = area.boundaryName && area.boundaryName !== area.name ? ` · ${area.boundaryName} ward` : "";
 
@@ -241,8 +228,8 @@ function AreaCard({
         <Metric
           label="Commute"
           passes={result.commuteMatches}
-          value={transit ? `${transit.minutes} min` : "Checking"}
-          detail={transit ? `transit${walking ? ` · walk ${walking.minutes} min` : ""}` : "TfL Journey Planner · on demand"}
+          value={transit ? `~${transit.minutes} min` : "Unavailable"}
+          detail={transit ? `estimated transit${walking ? ` · walk ~${walking.minutes} min` : ""}` : "distance estimate unavailable"}
         />
         <Metric
           label="Rent"
@@ -257,8 +244,6 @@ function AreaCard({
           detail={crime ? `${crime.month} · within ${crime.radiusMiles} mile` : "Police.uk · one-mile radius"}
         />
       </div>
-
-      {!compact && route && <div className="routeLine"><span className="routeIcon">↳</span><span>{route}</span></div>}
 
       {!compact && area.profile.tags.length > 0 && (
         <div className="tagRow">
