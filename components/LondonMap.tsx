@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import maplibregl, { type GeoJSONSource, type Map as MapLibreMap } from "maplibre-gl";
-import type { Feature, FeatureCollection, Geometry } from "geojson";
+import type { Feature, FeatureCollection, Geometry, MultiPolygon, Polygon, Position } from "geojson";
 import type { MatchResult } from "@/lib/types";
 
 type Props = {
@@ -53,7 +53,7 @@ function geometryCentre(geometry: Geometry) {
     value.forEach(visit);
   };
 
-  visit((geometry as any).coordinates);
+  visit((geometry as Polygon | MultiPolygon).coordinates);
   if (!Number.isFinite(minLng)) return { lng: -0.1276, lat: 51.5072 };
   return { lng: (minLng + maxLng) / 2, lat: (minLat + maxLat) / 2 };
 }
@@ -75,12 +75,8 @@ function nearestResult(feature: Feature<Geometry>, results: MatchResult[]) {
   return nearest;
 }
 
-function decorateWards(
-  wards: FeatureCollection<Geometry>,
-  results: MatchResult[],
-): FeatureCollection<Geometry> {
+function decorateWards(wards: FeatureCollection<Geometry>, results: MatchResult[]): FeatureCollection<Geometry> {
   const byCode = new Map(results.map((result) => [result.area.wardCode, result]));
-
   return {
     type: "FeatureCollection",
     features: wards.features.map((feature) => {
@@ -94,12 +90,66 @@ function decorateWards(
           id: result?.area.id || code,
           name: result?.area.name || feature.properties?.ward_name || code,
           state: result?.state || "context",
-          dataStatus: result?.area.dataStatus || "context",
           inModel: Boolean(result),
           isAnchor: Boolean(anchor),
         },
       };
     }),
+  };
+}
+
+function makeResultLabels(results: MatchResult[]): FeatureCollection {
+  return {
+    type: "FeatureCollection",
+    features: results
+      .filter((result) => result.state === "match" || result.state === "near")
+      .map((result) => ({
+        type: "Feature",
+        properties: {
+          id: result.area.id,
+          name: result.area.name,
+          state: result.state,
+        },
+        geometry: {
+          type: "Point",
+          coordinates: [result.area.referencePoint.lng, result.area.referencePoint.lat],
+        },
+      })),
+  };
+}
+
+function makeOutsideMask(boundary: FeatureCollection<Geometry>): FeatureCollection<Geometry> {
+  const holes: Position[][] = [];
+  for (const feature of boundary.features) {
+    if (feature.geometry.type === "Polygon") {
+      const ring = (feature.geometry as Polygon).coordinates[0];
+      if (ring) holes.push([...ring].reverse());
+    }
+    if (feature.geometry.type === "MultiPolygon") {
+      for (const polygon of (feature.geometry as MultiPolygon).coordinates) {
+        if (polygon[0]) holes.push([...polygon[0]].reverse());
+      }
+    }
+  }
+
+  const world: Position[] = [
+    [-180, -85],
+    [180, -85],
+    [180, 85],
+    [-180, 85],
+    [-180, -85],
+  ];
+
+  return {
+    type: "FeatureCollection",
+    features: [{
+      type: "Feature",
+      properties: {},
+      geometry: {
+        type: "Polygon",
+        coordinates: [world, ...holes],
+      },
+    }],
   };
 }
 
@@ -146,11 +196,8 @@ export function LondonMap({ results, selectedId, onSelect, destinationPostcode }
         const location = (await response.json()) as WorkLocation;
         workLocationRef.current = location;
         setWorkLocation(location);
-        const map = mapRef.current;
-        if (map?.isStyleLoaded()) {
-          const source = map.getSource("work-location") as GeoJSONSource | undefined;
-          source?.setData(makeWorkCollection(location));
-        }
+        const source = mapRef.current?.getSource("work-location") as GeoJSONSource | undefined;
+        source?.setData(makeWorkCollection(location));
       } catch {
         if (!controller.signal.aborted) {
           workLocationRef.current = null;
@@ -202,8 +249,17 @@ export function LondonMap({ results, selectedId, onSelect, destinationPostcode }
         setWardCount(data.wards.features.length);
 
         map.addSource("london-boundary", { type: "geojson", data: data.boundary });
+        map.addSource("london-outside", { type: "geojson", data: makeOutsideMask(data.boundary) });
         map.addSource("london-wards", { type: "geojson", data: decorateWards(data.wards, results) });
+        map.addSource("result-labels", { type: "geojson", data: makeResultLabels(results) });
         map.addSource("work-location", { type: "geojson", data: makeWorkCollection(workLocationRef.current) });
+
+        map.addLayer({
+          id: "london-outside-mask",
+          type: "fill",
+          source: "london-outside",
+          paint: { "fill-color": "#c9cdd1", "fill-opacity": 0.86 },
+        });
 
         map.addLayer({
           id: "london-wards-fill",
@@ -241,21 +297,20 @@ export function LondonMap({ results, selectedId, onSelect, destinationPostcode }
         });
 
         map.addLayer({
-          id: "london-ward-labels",
+          id: "result-area-labels",
           type: "symbol",
-          source: "london-wards",
-          minzoom: 9.15,
-          filter: ["==", ["get", "isAnchor"], true],
+          source: "result-labels",
+          minzoom: 8.45,
           layout: {
             "text-field": ["get", "name"],
-            "text-size": ["interpolate", ["linear"], ["zoom"], 9.15, 9, 13, 12],
+            "text-size": ["interpolate", ["linear"], ["zoom"], 8.45, 10, 12, 12],
             "text-allow-overlap": false,
-            "text-padding": 4,
+            "text-padding": 3,
           },
           paint: {
-            "text-color": "#242a30",
+            "text-color": ["case", ["==", ["get", "state"], "match"], "#0d5139", "#7c4d00"],
             "text-halo-color": "rgba(255,255,255,0.96)",
-            "text-halo-width": 1.5,
+            "text-halo-width": 2,
           },
         });
 
@@ -264,11 +319,7 @@ export function LondonMap({ results, selectedId, onSelect, destinationPostcode }
           type: "line",
           source: "london-wards",
           filter: ["==", ["get", "id"], selectedId || "__none__"],
-          paint: {
-            "line-color": "#101214",
-            "line-width": 2.6,
-            "line-opacity": 0.95,
-          },
+          paint: { "line-color": "#101214", "line-width": 2.6, "line-opacity": 0.95 },
         });
 
         map.addLayer({
@@ -313,7 +364,6 @@ export function LondonMap({ results, selectedId, onSelect, destinationPostcode }
 
         const workSource = map.getSource("work-location") as GeoJSONSource | undefined;
         workSource?.setData(makeWorkCollection(workLocationRef.current));
-
         window.requestAnimationFrame(fitToLondon);
         setGeographyStatus("ready");
       } catch {
@@ -339,8 +389,10 @@ export function LondonMap({ results, selectedId, onSelect, destinationPostcode }
     const map = mapRef.current;
     const wards = wardsRef.current;
     if (!map || !wards || !map.isStyleLoaded()) return;
-    const source = map.getSource("london-wards") as GeoJSONSource | undefined;
-    source?.setData(decorateWards(wards, results));
+    const wardSource = map.getSource("london-wards") as GeoJSONSource | undefined;
+    const labelSource = map.getSource("result-labels") as GeoJSONSource | undefined;
+    wardSource?.setData(decorateWards(wards, results));
+    labelSource?.setData(makeResultLabels(results));
   }, [resultSignature, results]);
 
   useEffect(() => {
@@ -358,9 +410,7 @@ export function LondonMap({ results, selectedId, onSelect, destinationPostcode }
   }, [selectedId, results]);
 
   useEffect(() => {
-    const map = mapRef.current;
-    if (!map || !map.isStyleLoaded()) return;
-    const source = map.getSource("work-location") as GeoJSONSource | undefined;
+    const source = mapRef.current?.getSource("work-location") as GeoJSONSource | undefined;
     source?.setData(makeWorkCollection(workLocation));
   }, [workLocation]);
 
