@@ -8,7 +8,11 @@ type Props = {
   selectedId: string | null;
   onSelect: (id: string) => void;
   isLoading: boolean;
-  readyCount: number;
+  factsReadyCount: number;
+  candidateCount: number;
+  commuteCheckedCount: number;
+  commuteLoadingCount: number;
+  commuteErrorCount: number;
   generatedAt: string | null;
 };
 
@@ -25,6 +29,7 @@ function statusLabel(result: MatchResult) {
   if (result.state === "match") return "Matches all";
   if (result.state === "near") return `Misses ${result.failedCriteria[0]}`;
   if (result.state === "fail") return `Misses ${result.failedCriteria.length} criteria`;
+  if (result.missingCriteria.length === 1 && result.missingCriteria[0] === "commute") return "Checking commute";
   return `Waiting for ${result.missingCriteria.join(", ") || "data"}`;
 }
 
@@ -41,7 +46,11 @@ export function ResultsPanel({
   selectedId,
   onSelect,
   isLoading,
-  readyCount,
+  factsReadyCount,
+  candidateCount,
+  commuteCheckedCount,
+  commuteLoadingCount,
+  commuteErrorCount,
   generatedAt,
 }: Props) {
   const matches = results.filter((result) => result.state === "match");
@@ -49,27 +58,30 @@ export function ResultsPanel({
   const nonMatches = results.filter((result) => result.state === "fail");
   const pending = results.filter((result) => result.state === "pending");
   const refreshed = updatedLabel(generatedAt);
-  const metricsPreparing = !isLoading && results.length > 0 && readyCount === 0 && pending.length > 0;
+  const factsLoading = !isLoading && results.length > 0 && factsReadyCount === 0;
+
+  const heading = isLoading
+    ? "Loading London…"
+    : factsLoading
+      ? "Loading rent + crime…"
+      : commuteLoadingCount > 0
+        ? `${matches.length} matches · checking commutes`
+        : `${matches.length} ${matches.length === 1 ? "area matches" : "areas match"}`;
 
   return (
     <aside className="resultsPanel">
       <div className="resultsHeader">
         <div>
           <p className="eyebrow">London rental fit</p>
-          <h1>
-            {isLoading
-              ? "Loading London…"
-              : metricsPreparing
-                ? "Preparing London data…"
-                : `${matches.length} ${matches.length === 1 ? "area matches" : "areas match"}`}
-          </h1>
+          <h1>{heading}</h1>
           <p className="coverageCopy">
             {results.length > 0
-              ? metricsPreparing
-                ? `${results.length} Greater London areas loaded · commute, rent and crime metrics are being prepared`
-                : `${results.length} Greater London areas · ${readyCount} fully evaluated${pending.length ? ` · ${pending.length} awaiting metrics` : ""}`
-              : "Loading official Greater London boundaries and metrics…"}
+              ? `${results.length} representative areas · ${factsReadyCount} have rent + crime${factsReadyCount > 0 ? ` · ${candidateCount} pass those filters · ${commuteCheckedCount}/${candidateCount} commutes checked` : ""}`
+              : "Loading representative London areas…"}
           </p>
+          {commuteErrorCount > 0 && (
+            <p className="coverageCopy">{commuteErrorCount} commute lookups could not be resolved yet; other results continue loading.</p>
+          )}
         </div>
         <span className="demoBadge live">Official boundaries</span>
       </div>
@@ -80,14 +92,14 @@ export function ResultsPanel({
         <span>£{filters.rentMin.toLocaleString("en-GB")}–£{filters.rentMax.toLocaleString("en-GB")}</span>
         <span>{String(filters.bedroom) === "studio" ? "Studio" : `${filters.bedroom} bed`}</span>
         <span>≤ {filters.maxCrime === 9999 ? "Any" : filters.maxCrime} crimes / month</span>
-        {refreshed && <span>Metrics updated {refreshed}</span>}
+        {refreshed && <span>Facts updated {refreshed}</span>}
       </div>
 
       <div className="resultsList">
-        {metricsPreparing && (
+        {factsLoading && (
           <div className="emptyState">
-            <strong>Metrics refresh in progress</strong>
-            <p>All Greater London area boundaries are available. Match results appear once commute, rent and reported-crime data has been calculated.</p>
+            <strong>Area boundaries and profiles are ready</strong>
+            <p>Rent and reported-crime facts are refreshing for the smaller 80-area model. Commute is no longer precomputed for every London ward.</p>
           </div>
         )}
 
@@ -99,7 +111,7 @@ export function ResultsPanel({
           onSelect={onSelect}
         />
 
-        {!isLoading && !metricsPreparing && matches.length === 0 && results.length > 0 && pending.length === 0 && (
+        {!isLoading && !factsLoading && matches.length === 0 && results.length > 0 && pending.length === 0 && (
           <div className="emptyState">
             <strong>No exact matches</strong>
             <p>Try widening one constraint. Almost matches are shown below.</p>
@@ -116,18 +128,18 @@ export function ResultsPanel({
         />
 
         <ResultSection
-          title="Doesn’t match"
-          detail="Misses two or more criteria"
-          results={nonMatches}
+          title="Checking commute"
+          detail="Passed rent + crime; TfL commute is calculated only for candidates"
+          results={pending}
           selectedId={selectedId}
           onSelect={onSelect}
           compact
         />
 
         <ResultSection
-          title="Metrics pending"
-          detail="Boundary is ready; one or more factual metrics are still unavailable"
-          results={pending}
+          title="Doesn’t match"
+          detail="Already ruled out by the active constraints"
+          results={nonMatches}
           selectedId={selectedId}
           onSelect={onSelect}
           compact
@@ -211,13 +223,14 @@ function AreaCard({
   const walking = area.commute.walking;
   const route = transit?.legs?.map(routeLabel).join(" → ");
   const crime = area.crime;
+  const boundary = area.boundaryName && area.boundaryName !== area.name ? ` · ${area.boundaryName} ward` : "";
 
   return (
     <button type="button" onClick={onSelect} className={`areaCard ${result.state} ${selected ? "selected" : ""}`}>
       <div className="cardTopline">
         <div>
           <h2>{area.name}</h2>
-          <p>{area.borough}</p>
+          <p>{area.borough}{boundary}</p>
         </div>
         <span className={`matchPill ${result.state}`}>{statusLabel(result)}</span>
       </div>
@@ -228,8 +241,8 @@ function AreaCard({
         <Metric
           label="Commute"
           passes={result.commuteMatches}
-          value={transit ? `${transit.minutes} min` : "Pending"}
-          detail={transit ? `transit${walking ? ` · walk ${walking.minutes} min` : ""}` : "TfL Journey Planner"}
+          value={transit ? `${transit.minutes} min` : "Checking"}
+          detail={transit ? `transit${walking ? ` · walk ${walking.minutes} min` : ""}` : "TfL Journey Planner · on demand"}
         />
         <Metric
           label="Rent"
