@@ -21,7 +21,7 @@ const initialFilters: FilterState = {
 
 export default function Home() {
   const [filters, setFilters] = useState<FilterState>(initialFilters);
-  const [selectedId, setSelectedId] = useState<string | null>("hoxton");
+  const [selectedId, setSelectedId] = useState<string | null>(null);
 
   const results = useMemo(
     () => rankResults(londonAreas.map((area) => evaluateArea(area, filters))),
