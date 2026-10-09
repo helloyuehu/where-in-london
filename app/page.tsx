@@ -1,12 +1,12 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { FilterBar } from "@/components/FilterBar";
 import { LondonMap } from "@/components/LondonMap";
 import { ResultsPanel } from "@/components/ResultsPanel";
 import { londonAreas } from "@/lib/data/areas";
 import { evaluateArea, rankResults } from "@/lib/filter";
-import type { FilterState } from "@/lib/types";
+import type { FilterState, LondonArea } from "@/lib/types";
 
 const initialFilters: FilterState = {
   destinationPostcode: "W1D 3QW",
@@ -22,10 +22,25 @@ const initialFilters: FilterState = {
 export default function Home() {
   const [filters, setFilters] = useState<FilterState>(initialFilters);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [areas, setAreas] = useState<LondonArea[]>(londonAreas);
+  const [dataMode, setDataMode] = useState<"demo" | "generated">("demo");
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/ward-metrics", { cache: "no-store" })
+      .then((response) => response.json())
+      .then((payload) => {
+        if (cancelled || !Array.isArray(payload?.areas) || payload.areas.length === 0) return;
+        setAreas(payload.areas as LondonArea[]);
+        setDataMode("generated");
+      })
+      .catch(() => undefined);
+    return () => { cancelled = true; };
+  }, []);
 
   const results = useMemo(
-    () => rankResults(londonAreas.map((area) => evaluateArea(area, filters))),
-    [filters],
+    () => rankResults(areas.map((area) => evaluateArea(area, filters))),
+    [areas, filters],
   );
 
   return (
@@ -50,7 +65,13 @@ export default function Home() {
           onSelect={setSelectedId}
           destinationPostcode={filters.destinationPostcode}
         />
-        <ResultsPanel filters={filters} results={results} selectedId={selectedId} onSelect={setSelectedId} />
+        <ResultsPanel
+          filters={filters}
+          results={results}
+          selectedId={selectedId}
+          onSelect={setSelectedId}
+          dataMode={dataMode}
+        />
       </div>
     </main>
   );
