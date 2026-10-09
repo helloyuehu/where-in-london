@@ -4,16 +4,18 @@ import { NextResponse } from "next/server";
 import type { Feature, FeatureCollection, Geometry, MultiPolygon, Polygon, Position } from "geojson";
 
 const GLA_WARDS = "https://gis.london.gov.uk/arcgis/rest/services/apps/webmap_context_layer/MapServer/9/query?where=1%3D1&outFields=ward_code%2Cward_name%2Cla_name%2Cla_gss_code&returnGeometry=true&outSR=4326&f=geojson";
+const TARGET_AREA_COUNT = 80;
 
 export const revalidate = 86400;
 
-const LONDON_BOROUGHS = new Set([
-  "barking and dagenham", "barnet", "bexley", "brent", "bromley", "camden", "city of london",
-  "croydon", "ealing", "enfield", "greenwich", "hackney", "hammersmith and fulham", "haringey",
-  "harrow", "havering", "hillingdon", "hounslow", "islington", "kensington and chelsea", "kingston upon thames",
-  "lambeth", "lewisham", "merton", "newham", "redbridge", "richmond upon thames", "southwark", "sutton",
-  "tower hamlets", "waltham forest", "wandsworth", "westminster",
-]);
+const LONDON_BOROUGHS = [
+  "Barking and Dagenham", "Barnet", "Bexley", "Brent", "Bromley", "Camden", "City of London",
+  "Croydon", "Ealing", "Enfield", "Greenwich", "Hackney", "Hammersmith and Fulham", "Haringey",
+  "Harrow", "Havering", "Hillingdon", "Hounslow", "Islington", "Kensington and Chelsea", "Kingston upon Thames",
+  "Lambeth", "Lewisham", "Merton", "Newham", "Redbridge", "Richmond upon Thames", "Southwark", "Sutton",
+  "Tower Hamlets", "Waltham Forest", "Wandsworth", "Westminster",
+];
+const LONDON_BOROUGH_SET = new Set(LONDON_BOROUGHS.map((name) => normalise(name)));
 
 type GeneratedWard = {
   id?: string;
@@ -50,6 +52,21 @@ type CensusProfilePayload = {
   profiles?: Record<string, CensusProfile>;
 };
 
+type AreaPriority = {
+  label: string;
+  query: string;
+  borough: string;
+};
+
+type WardRow = {
+  feature: Feature<Geometry>;
+  code: string;
+  officialName: string;
+  borough: string;
+  point: { lat: number; lng: number };
+  displayName: string;
+};
+
 function normalise(value: unknown) {
   return String(value || "")
     .toLowerCase()
@@ -64,7 +81,7 @@ function normalise(value: unknown) {
 function isLondonFeature(feature: Feature<Geometry>) {
   const properties = feature.properties || {};
   const borough = properties.la_name || properties.LA_NAME || properties.lad22nm || properties.LAD22NM;
-  return LONDON_BOROUGHS.has(normalise(borough));
+  return LONDON_BOROUGH_SET.has(normalise(borough));
 }
 
 function outerRings(geometry: Geometry): Position[][] {
@@ -106,12 +123,96 @@ function referencePoint(geometry: Geometry) {
   return ringCentroid(ring);
 }
 
+function distanceSq(a: { lat: number; lng: number }, b: { lat: number; lng: number }) {
+  const scale = Math.cos(((a.lat + b.lat) / 2) * Math.PI / 180);
+  const dx = (a.lng - b.lng) * scale;
+  const dy = a.lat - b.lat;
+  return dx * dx + dy * dy;
+}
+
 async function readJson<T>(filePath: string, fallback: T): Promise<T> {
   try {
     return JSON.parse(await readFile(path.join(process.cwd(), filePath), "utf8")) as T;
   } catch {
     return fallback;
   }
+}
+
+function selectRepresentativeAreas(features: Feature<Geometry>[], priorities: AreaPriority[]): WardRow[] {
+  const rows: WardRow[] = features.filter(isLondonFeature).map((feature, index) => {
+    const properties = feature.properties || {};
+    const officialName = String(properties.ward_name || `Area ${index + 1}`);
+    const code = String(properties.ward_code || `ward-${index + 1}`);
+    const borough = String(properties.la_name || "London");
+    return {
+      feature,
+      code,
+      officialName,
+      borough,
+      point: referencePoint(feature.geometry),
+      displayName: officialName,
+    };
+  });
+
+  const used = new Set<string>();
+  const selected: WardRow[] = [];
+
+  const add = (row: WardRow, displayName = row.officialName) => {
+    if (used.has(row.code) || selected.length >= TARGET_AREA_COUNT) return false;
+    used.add(row.code);
+    selected.push({ ...row, displayName });
+    return true;
+  };
+
+  const findPriorityMatch = (priority: AreaPriority) => {
+    const query = normalise(priority.query || priority.label);
+    return rows.find((row) => !used.has(row.code)
+      && normalise(row.borough) === normalise(priority.borough)
+      && normalise(row.officialName).includes(query));
+  };
+
+  for (const borough of LONDON_BOROUGHS) {
+    const priority = priorities.find((item) => normalise(item.borough) === normalise(borough));
+    const preferred = priority ? findPriorityMatch(priority) : undefined;
+    if (preferred) {
+      add(preferred, priority?.label || preferred.officialName);
+      continue;
+    }
+
+    const boroughRows = rows.filter((row) => normalise(row.borough) === normalise(borough));
+    if (!boroughRows.length) continue;
+    const centre = {
+      lat: boroughRows.reduce((sum, row) => sum + row.point.lat, 0) / boroughRows.length,
+      lng: boroughRows.reduce((sum, row) => sum + row.point.lng, 0) / boroughRows.length,
+    };
+    boroughRows.sort((a, b) => distanceSq(a.point, centre) - distanceSq(b.point, centre));
+    add(boroughRows[0]);
+  }
+
+  for (const priority of priorities) {
+    if (selected.length >= TARGET_AREA_COUNT) break;
+    const matched = findPriorityMatch(priority);
+    if (matched) add(matched, priority.label || matched.officialName);
+  }
+
+  while (selected.length < Math.min(TARGET_AREA_COUNT, rows.length)) {
+    let best: WardRow | null = null;
+    let bestScore = -1;
+    for (const row of rows) {
+      if (used.has(row.code)) continue;
+      const score = selected.length
+        ? Math.min(...selected.map((chosen) => distanceSq(row.point, chosen.point)))
+        : 0;
+      if (score > bestScore) {
+        best = row;
+        bestScore = score;
+      }
+    }
+    if (!best) break;
+    add(best);
+  }
+
+  return selected;
 }
 
 function sourceList(ward: GeneratedWard | undefined, censusProfile: CensusProfile | undefined) {
@@ -125,37 +226,58 @@ function sourceList(ward: GeneratedWard | undefined, censusProfile: CensusProfil
         .map(([label, detail]) => ({ label, detail: String(detail) })),
     );
   }
-  if (censusProfile?.source) {
-    sources.push({ label: "profile", detail: censusProfile.source });
-  }
+  if (censusProfile?.source) sources.push({ label: "profile", detail: censusProfile.source });
   return sources.filter((source, index, all) => all.findIndex((candidate) => candidate.detail === source.detail) === index);
 }
 
 export async function GET() {
   try {
-    const [wardsResponse, generated, censusProfiles] = await Promise.all([
+    const [wardsResponse, generated, censusProfiles, priorities] = await Promise.all([
       fetch(GLA_WARDS, { next: { revalidate } }),
       readJson<GeneratedPayload>("lib/data/ward-metrics.generated.json", { wards: [] }),
       readJson<CensusProfilePayload>("data/ward-profiles.generated.json", { profiles: {} }),
+      readJson<AreaPriority[]>("data/area-priorities.json", []),
     ]);
     if (!wardsResponse.ok) throw new Error("Official GLA ward request failed");
 
     const allWards = (await wardsResponse.json()) as FeatureCollection<Geometry>;
-    const wardFeatures = allWards.features.filter(isLondonFeature);
+    const londonFeatures = allWards.features.filter(isLondonFeature);
     const generatedByCode = new Map<string, GeneratedWard>();
     for (const ward of generated.wards || []) {
       const code = ward.wardCode || ward.id;
       if (code) generatedByCode.set(code, ward);
     }
 
-    const areas = wardFeatures.map((feature: Feature<Geometry>, index) => {
-      const properties = feature.properties || {};
-      const wardCode = String(properties.ward_code || `ward-${index + 1}`);
-      const name = String(properties.ward_name || `Ward ${index + 1}`);
-      const borough = String(properties.la_name || "London");
-      const point = referencePoint(feature.geometry);
-      const metrics = generatedByCode.get(wardCode);
-      const censusProfile = censusProfiles.profiles?.[wardCode];
+    let selectedRows: WardRow[];
+    if (generatedByCode.size >= 40) {
+      const generatedNames = new Map<string, string>();
+      for (const [code, ward] of generatedByCode) {
+        if (ward.name) generatedNames.set(code, ward.name);
+      }
+      selectedRows = londonFeatures
+        .map((feature, index) => {
+          const properties = feature.properties || {};
+          const code = String(properties.ward_code || `ward-${index + 1}`);
+          if (!generatedByCode.has(code)) return null;
+          const officialName = String(properties.ward_name || `Area ${index + 1}`);
+          const borough = String(properties.la_name || "London");
+          return {
+            feature,
+            code,
+            officialName,
+            borough,
+            point: referencePoint(feature.geometry),
+            displayName: generatedNames.get(code) || officialName,
+          } satisfies WardRow;
+        })
+        .filter((row): row is WardRow => Boolean(row));
+    } else {
+      selectedRows = selectRepresentativeAreas(londonFeatures, priorities);
+    }
+
+    const areas = selectedRows.map((row) => {
+      const metrics = generatedByCode.get(row.code);
+      const censusProfile = censusProfiles.profiles?.[row.code];
       const commute = {
         publicTransport: metrics?.commute?.publicTransport ?? null,
         walking: metrics?.commute?.walking ?? null,
@@ -167,30 +289,32 @@ export async function GET() {
         : metrics?.profile?.summary
           ? { summary: metrics.profile.summary, tags: metrics.profile.tags || [] }
           : {
-              summary: `${name} is an official electoral ward in ${borough}. Detailed demographic context is still being populated from official London data.`,
-              tags: [borough],
+              summary: `${row.displayName} is represented by an official ward boundary in ${row.borough}. Detailed demographic context is still being populated from official London data.`,
+              tags: [row.borough],
             };
-      const hardMetricsReady = Boolean(commute.publicTransport && crime && rentByBedroom);
-      const anyMetrics = Boolean(commute.publicTransport || commute.walking || crime || rentByBedroom);
+      const factsReady = Boolean(crime && rentByBedroom);
+      const anyFacts = Boolean(crime || rentByBedroom || commute.publicTransport || commute.walking);
 
       return {
-        id: wardCode,
-        wardCode,
-        name,
-        borough,
-        referencePoint: { name: `${name} ward reference point`, ...point },
+        id: row.code,
+        wardCode: row.code,
+        name: metrics?.name || row.displayName,
+        boundaryName: row.officialName,
+        borough: row.borough,
+        referencePoint: { name: `${row.displayName} area reference point`, ...row.point },
         commute,
         crime,
         rentByBedroom,
         profile,
         sources: sourceList(metrics, censusProfile),
-        dataStatus: hardMetricsReady ? "ready" : anyMetrics ? "partial" : "pending",
+        dataStatus: factsReady ? "ready" : anyFacts ? "partial" : "pending",
       };
     });
 
     return NextResponse.json({
       areas,
-      wardCount: areas.length,
+      areaCount: areas.length,
+      fullWardCount: londonFeatures.length,
       readyCount: areas.filter((area) => area.dataStatus === "ready").length,
       profileCount: areas.filter((area) => Boolean(censusProfiles.profiles?.[area.wardCode])).length,
       generatedAt: generated.generatedAt || null,
@@ -198,13 +322,14 @@ export async function GET() {
       metricsDestinationPostcode: generated.destinationPostcode || null,
       arriveBy: generated.arriveBy || null,
       policeMonth: generated.policeMonth || null,
+      selection: "Representative neighbourhood-scale London areas using official ward polygons",
       source: "Greater London Authority · London Wards (2022)",
     });
   } catch (error) {
     return NextResponse.json(
       {
         areas: [],
-        error: "London ward data is temporarily unavailable.",
+        error: "London area data is temporarily unavailable.",
         detail: error instanceof Error ? error.message : "Unknown error",
       },
       { status: 502 },
