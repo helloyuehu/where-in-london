@@ -160,7 +160,7 @@ export default function Home() {
           <div className="brandMark">W</div>
           <div>
             <strong>Where in London?</strong>
-            <span>Constraint-based area explorer</span>
+            <span>Find areas that fit your priorities.</span>
           </div>
         </div>
         <div className="methodNote">
