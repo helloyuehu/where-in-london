@@ -42,7 +42,7 @@ export default function Home() {
 
     fetch("/api/areas", { cache: "no-store" })
       .then((response) => {
-        if (!response.ok) throw new Error("London ward data unavailable");
+        if (!response.ok) throw new Error("London area data unavailable");
         return response.json() as Promise<AreasPayload>;
       })
       .then((payload) => {
@@ -82,6 +82,11 @@ export default function Home() {
   );
 
   const readyCount = effectiveAreas.filter((area) => area.dataStatus === "ready").length;
+  const londonCrimeAverage = useMemo(() => {
+    const totals = areas.flatMap((area) => area.crime ? [area.crime.total] : []);
+    if (!totals.length) return null;
+    return Math.round(totals.reduce((sum, total) => sum + total, 0) / totals.length);
+  }, [areas]);
 
   return (
     <main className="appFrame">
@@ -94,11 +99,15 @@ export default function Home() {
           </div>
         </div>
         <div className="methodNote">
-          {areas.length ? `${areas.length} London wards` : "All London wards"} · official geography · no combined score
+          {areas.length ? `${areas.length} London areas` : "All London areas"} · official ward boundaries · no combined score
         </div>
       </header>
 
-      <FilterBar filters={filters} onChange={setFilters} />
+      <FilterBar
+        filters={filters}
+        onChange={setFilters}
+        londonCrimeAverage={londonCrimeAverage}
+      />
 
       <div className="workspace">
         <LondonMap
