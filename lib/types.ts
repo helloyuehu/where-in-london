@@ -24,6 +24,7 @@ export type LondonArea = {
   id: string;
   wardCode: string;
   name: string;
+  boundaryName?: string;
   borough: string;
   referencePoint: {
     name: string;
