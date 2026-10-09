@@ -10,7 +10,7 @@ import type { FilterState, LondonArea } from "@/lib/types";
 const initialFilters: FilterState = {
   destinationPostcode: "W1D 3QW",
   maxCommuteMinutes: 40,
-  travelModes: ["publicTransport", "walking"],
+  travelModes: ["publicTransport"],
   arriveBy: "09:00",
   rentMin: 1500,
   rentMax: 2600,
@@ -30,8 +30,8 @@ function normalisePostcode(value: string) {
   return value.replace(/\s+/g, "").toUpperCase();
 }
 
-function commuteKey(area: LondonArea, postcode: string, arriveBy: string) {
-  return `${area.id}|${normalisePostcode(postcode)}|${arriveBy}`;
+function commuteKey(area: LondonArea, postcode: string, arriveBy: string, travelModes: FilterState["travelModes"]) {
+  return `${area.id}|${normalisePostcode(postcode)}|${arriveBy}|${[...travelModes].sort().join(",")}`;
 }
 
 export default function Home() {
@@ -92,7 +92,7 @@ export default function Home() {
   useEffect(() => {
     setRuntimeCommutes({});
     setCommuteErrorCount(0);
-  }, [filters.destinationPostcode, filters.arriveBy]);
+  }, [filters.destinationPostcode, filters.arriveBy, filters.travelModes]);
 
   useEffect(() => {
     const postcode = filters.destinationPostcode.trim();
@@ -105,7 +105,7 @@ export default function Home() {
     let cancelled = false;
 
     const pending = staticCandidates.filter((area) => {
-      const cached = commuteCacheRef.current.get(commuteKey(area, postcode, filters.arriveBy));
+      const cached = commuteCacheRef.current.get(commuteKey(area, postcode, filters.arriveBy, filters.travelModes));
       if (cached) return false;
       if (destinationChanged) return true;
       return filters.travelModes.some((mode) => !area.commute[mode]);
@@ -113,7 +113,7 @@ export default function Home() {
 
     const cachedUpdates: Record<string, LondonArea["commute"]> = {};
     for (const area of staticCandidates) {
-      const cached = commuteCacheRef.current.get(commuteKey(area, postcode, filters.arriveBy));
+      const cached = commuteCacheRef.current.get(commuteKey(area, postcode, filters.arriveBy, filters.travelModes));
       if (cached) cachedUpdates[area.id] = cached;
     }
     if (Object.keys(cachedUpdates).length) {
@@ -139,6 +139,7 @@ export default function Home() {
           lng: String(area.referencePoint.lng),
           destination: postcode,
           arriveBy: filters.arriveBy,
+          modes: filters.travelModes.join(","),
         });
 
         try {
@@ -152,7 +153,10 @@ export default function Home() {
             publicTransport: payload.publicTransport || null,
             walking: payload.walking || null,
           };
-          commuteCacheRef.current.set(commuteKey(area, postcode, filters.arriveBy), commute);
+          commuteCacheRef.current.set(
+            commuteKey(area, postcode, filters.arriveBy, filters.travelModes),
+            commute,
+          );
           if (!cancelled) {
             setRuntimeCommutes((current) => ({ ...current, [area.id]: commute }));
           }
@@ -166,7 +170,7 @@ export default function Home() {
       }
     };
 
-    void Promise.all(Array.from({ length: Math.min(4, pending.length) }, () => worker()));
+    void Promise.all(Array.from({ length: Math.min(2, pending.length) }, () => worker()));
 
     return () => {
       cancelled = true;
