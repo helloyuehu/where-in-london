@@ -10,12 +10,12 @@ import type { FilterState, LondonArea } from "@/lib/types";
 const initialFilters: FilterState = {
   destinationPostcode: "W1D 3QW",
   maxCommuteMinutes: 40,
-  travelModes: ["publicTransport"],
+  travelModes: ["publicTransport", "walking"],
   arriveBy: "09:00",
   rentMin: 1500,
   rentMax: 2600,
   bedroom: 1,
-  maxCrime: 299,
+  maxCrime: 1000,
 };
 
 type AreasPayload = {
@@ -160,7 +160,7 @@ export default function Home() {
           </div>
         </div>
         <div className="methodNote">
-          {areas.length ? `${areas.length} representative London areas` : "Representative London areas"} · official ward polygons · instant commute estimate
+          {areas.length ? `${areas.length} London living areas` : "London living areas"} · full-city coverage · instant commute estimate
         </div>
       </header>
 
