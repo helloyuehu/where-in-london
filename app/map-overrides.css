@@ -8,8 +8,8 @@
 }
 
 .maplibregl-ctrl-bottom-left {
-  left: 14px;
-  bottom: 10px;
+  left: 360px;
+  bottom: 14px;
 }
 
 .maplibregl-ctrl-bottom-left .maplibregl-ctrl {
@@ -22,7 +22,7 @@
 
 .geographyNote {
   left: 14px;
-  bottom: 46px;
+  bottom: 14px;
 }
 
 .areaCard.pending {
@@ -87,8 +87,13 @@
   }
 
   .geographyNote {
-    bottom: 44px;
+    bottom: 14px;
     max-width: min(310px, calc(100% - 28px));
+  }
+
+  .maplibregl-ctrl-bottom-left {
+    left: 14px;
+    bottom: 54px;
   }
 
   .maplibregl-ctrl-bottom-right {
