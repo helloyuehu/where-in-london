@@ -32,7 +32,7 @@ jobs:
           cache: npm
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       - name: Build Census-based profiles for every London ward
         run: node scripts/sync-census-profiles.mjs
@@ -49,6 +49,7 @@ jobs:
             echo "No profile changes to commit."
           else
             git commit -m "Refresh Census-based London area profiles"
+            git reset --hard HEAD
             git pull --rebase origin main
             git push origin HEAD:main
           fi
