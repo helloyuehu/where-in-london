@@ -27,9 +27,10 @@ export function FilterBar({ filters, onChange, onApply, isDirty, londonCrimeAver
       className="filterBar"
       aria-label="Search filters"
       style={{
-        gridTemplateColumns: "minmax(92px,.62fr) 96px 120px 122px minmax(150px,.95fr) 96px minmax(185px,1.05fr) 118px",
-        gap: 8,
-        overflowX: "auto",
+        gridTemplateColumns: "minmax(0,.72fr) 88px 112px 108px minmax(0,1.05fr) 90px minmax(0,1.12fr) 112px",
+        gap: 7,
+        overflowX: "hidden",
+        minWidth: 0,
       }}
     >
       <div className="filterGroup destinationGroup">
@@ -63,13 +64,13 @@ export function FilterBar({ filters, onChange, onApply, isDirty, londonCrimeAver
           type="time"
           value={filters.arriveBy}
           onChange={(event) => update("arriveBy", event.target.value)}
-          style={{ minWidth: 116, paddingLeft: 8, paddingRight: 8 }}
+          style={{ minWidth: 0, width: "100%", paddingLeft: 8, paddingRight: 8 }}
         />
       </div>
 
       <div className="filterGroup rentGroup">
         <span className="fieldLabel">Monthly rent</span>
-        <div className="rentInputs" style={{ gridTemplateColumns: "minmax(56px,1fr) auto minmax(56px,1fr)" }}>
+        <div className="rentInputs" style={{ gridTemplateColumns: "minmax(52px,1fr) auto minmax(52px,1fr)" }}>
           <div className="numberPrefix"><span>£</span><input aria-label="Minimum rent" type="number" step={50} value={filters.rentMin} onChange={(event) => update("rentMin", Number(event.target.value) || 0)} /></div>
           <span className="rangeDash">to</span>
           <div className="numberPrefix"><span>£</span><input aria-label="Maximum rent" type="number" step={50} value={filters.rentMax} onChange={(event) => update("rentMax", Number(event.target.value) || 0)} /></div>
@@ -119,15 +120,17 @@ export function FilterBar({ filters, onChange, onApply, isDirty, londonCrimeAver
           onClick={onApply}
           disabled={!isDirty}
           style={{
-            height: 48,
+            width: "100%",
+            height: 38,
             border: 0,
-            borderRadius: 10,
+            borderRadius: 9,
             background: "#17191c",
             color: "#fff",
             fontWeight: 700,
+            fontSize: 12,
             cursor: isDirty ? "pointer" : "default",
             opacity: isDirty ? 1 : 0.38,
-            padding: "0 14px",
+            padding: "0 10px",
             whiteSpace: "nowrap",
           }}
         >
