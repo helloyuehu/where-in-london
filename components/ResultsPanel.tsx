@@ -236,6 +236,13 @@ function AreaCard({
           {area.profile.tags.map((tag) => <span key={tag}>{tag}</span>)}
         </div>
       )}
+
+      {!compact && area.sources.length > 0 && (
+        <div className="sourceLine" aria-label="Data sources">
+          <span>Sources</span>
+          <span>{Array.from(new Set(area.sources.map((source) => source.detail))).join(" · ")}</span>
+        </div>
+      )}
     </button>
   );
 }
