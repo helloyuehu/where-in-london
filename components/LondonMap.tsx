@@ -105,18 +105,27 @@ export function LondonMap({ results, selectedId, onSelect, destinationPostcode }
   useEffect(() => {
     if (!containerRef.current || mapRef.current) return;
 
+    const container = containerRef.current;
     const map = new maplibregl.Map({
-      container: containerRef.current,
+      container,
       style: "https://demotiles.maplibre.org/style.json",
       bounds: LONDON_BOUNDS,
       fitBoundsOptions: { padding: 24 },
       maxBounds: LONDON_BOUNDS,
       minZoom: 8.6,
       maxZoom: 15,
+      scrollZoom: true,
+      dragPan: true,
+      doubleClickZoom: true,
       attributionControl: true,
     });
 
     map.addControl(new maplibregl.NavigationControl({ visualizePitch: false }), "bottom-left");
+
+    const fitToLondon = () => {
+      map.resize();
+      map.fitBounds(LONDON_BOUNDS, { padding: 24, duration: 0 });
+    };
 
     map.on("load", async () => {
       try {
@@ -231,15 +240,25 @@ export function LondonMap({ results, selectedId, onSelect, destinationPostcode }
           if (typeof id === "string") onSelect(id);
         });
 
-        map.fitBounds(LONDON_BOUNDS, { padding: 24, duration: 0 });
+        window.requestAnimationFrame(fitToLondon);
         setGeographyStatus("ready");
       } catch {
         setGeographyStatus("fallback");
       }
     });
 
+    const resizeObserver = typeof ResizeObserver !== "undefined"
+      ? new ResizeObserver(() => map.resize())
+      : null;
+    resizeObserver?.observe(container);
+
+    const handleWindowResize = () => map.resize();
+    window.addEventListener("resize", handleWindowResize);
+
     mapRef.current = map;
     return () => {
+      resizeObserver?.disconnect();
+      window.removeEventListener("resize", handleWindowResize);
       map.remove();
       mapRef.current = null;
     };
