@@ -55,6 +55,30 @@
   color: #176b4b;
 }
 
+.sourceLine {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 8px;
+  margin-top: 11px;
+  padding-top: 9px;
+  border-top: 1px solid #ece9e3;
+  color: #76716a;
+  font-size: 9px;
+  line-height: 1.35;
+}
+
+.sourceLine > span:first-child {
+  color: #4f4b45;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+}
+
+.sourceLine > span:last-child {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
 @media (max-width: 820px) {
   .mapLegend {
     left: 14px;
