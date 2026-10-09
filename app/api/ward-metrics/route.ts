@@ -48,8 +48,8 @@ export async function GET() {
         crime: ward.crime,
         rentByBedroom: ward.rentByBedroom,
         profile: {
-          summary: ward.profile.summary,
-          tags: ward.profile.tags || [],
+          summary: ward.profile?.summary ?? "",
+          tags: ward.profile?.tags ?? [],
         },
         sources: Object.entries(ward.sources || {})
           .filter(([, value]) => Boolean(value))
