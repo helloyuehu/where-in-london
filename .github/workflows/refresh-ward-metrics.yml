@@ -9,6 +9,7 @@ on:
     paths:
       - ".github/workflows/refresh-ward-metrics.yml"
       - "scripts/sync-ward-metrics.mjs"
+      - "scripts/run-london-ward-metrics.mjs"
       - "package.json"
 
 permissions:
@@ -35,7 +36,7 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Refresh official London ward metrics
+      - name: Refresh official Greater London ward metrics
         run: npm run sync:wards
         env:
           TFL_APP_KEY: ${{ secrets.TFL_APP_KEY }}
@@ -54,7 +55,8 @@ jobs:
           if git diff --cached --quiet; then
             echo "No metric changes to commit."
           else
-            git commit -m "Refresh official London ward metrics"
+            git commit -m "Refresh official Greater London ward metrics"
+            git reset --hard HEAD
             git pull --rebase origin main
             git push origin HEAD:main
           fi
