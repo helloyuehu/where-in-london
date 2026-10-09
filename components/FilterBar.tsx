@@ -74,13 +74,15 @@ export function FilterBar({ filters, onChange, londonCrimeAverage }: Props) {
         <label htmlFor="crime">Max reported crime / month</label>
         <span className="filterSubheader">
           {londonCrimeAverage === null
-            ? "London average · loading official data"
-            : `London average · ${londonCrimeAverage} reported crimes / month`}
+            ? "London area average · loading official data"
+            : `London area average · ${londonCrimeAverage} reported crimes / month`}
         </span>
         <select id="crime" value={filters.maxCrime} onChange={(event) => update("maxCrime", Number(event.target.value))}>
-          <option value={49}>Under 50</option>
-          <option value={99}>50–99</option>
-          <option value={199}>100–199</option>
+          <option value={49}>≤ 49</option>
+          <option value={99}>≤ 99</option>
+          <option value={199}>≤ 199</option>
+          <option value={299}>≤ 299</option>
+          <option value={499}>≤ 499</option>
           <option value={9999}>Any</option>
         </select>
       </div>
