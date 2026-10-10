@@ -1,0 +1,55 @@
+.filterMobileToggle {
+  display: none;
+}
+
+@media (max-width: 820px) {
+  .filterMobileToggle {
+    width: 100%;
+    min-height: 48px;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 10px;
+    padding: 0 14px;
+    border: 0;
+    background: #fff;
+    text-align: left;
+  }
+
+  .filterMobileTitle {
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .filterMobileSummary {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--muted);
+    font-size: 10px;
+  }
+
+  .filterMobileChevron {
+    color: var(--muted);
+    font-size: 9px;
+  }
+
+  .filterShell:not(.filtersExpanded) .filterBar {
+    display: none !important;
+  }
+
+  .filterShell.filtersExpanded .filterBar {
+    display: flex !important;
+    max-height: 44dvh;
+    overflow-y: auto !important;
+    padding: 12px 14px;
+    border-top: 1px solid var(--border);
+  }
+
+  .filterShell.filtersExpanded .filterBar > .filterGroup {
+    flex: 1 0 100% !important;
+    min-width: 0 !important;
+  }
+}
