@@ -28,7 +28,15 @@ type DestinationPoint = {
   lng: number;
 };
 
+type PostcodePayload = DestinationPoint & {
+  postcode?: string;
+};
+
 const DEFAULT_WORK_POINT: DestinationPoint = { lat: 51.5136, lng: -0.1311 };
+
+function normalisePostcode(value: string) {
+  return value.replace(/\s+/g, "").toUpperCase();
+}
 
 function haversineKm(a: DestinationPoint, b: DestinationPoint) {
   const radiusKm = 6371;
@@ -60,6 +68,8 @@ function estimatedCommute(area: LondonArea, destination: DestinationPoint): Lond
 
 export default function Home() {
   const [filters, setFilters] = useState<FilterState>(initialFilters);
+  const [postcodeDraft, setPostcodeDraft] = useState(initialFilters.destinationPostcode);
+  const [postcodeUpdating, setPostcodeUpdating] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [areas, setAreas] = useState<LondonArea[]>([]);
   const [isLoadingAreas, setIsLoadingAreas] = useState(true);
@@ -68,6 +78,56 @@ export default function Home() {
 
   const handleSelect = (id: string) => {
     setSelectedId((current) => current === id ? null : id);
+  };
+
+  const postcodeDirty = normalisePostcode(postcodeDraft) !== normalisePostcode(filters.destinationPostcode);
+
+  const handlePostcodeApply = async () => {
+    const postcode = postcodeDraft.trim().toUpperCase();
+    if (!postcode || !postcodeDirty || postcodeUpdating) return;
+
+    setPostcodeUpdating(true);
+    const controller = new AbortController();
+
+    const lookup = async () => {
+      const response = await fetch(`/api/postcode?postcode=${encodeURIComponent(postcode)}`, {
+        signal: controller.signal,
+        cache: "no-store",
+      });
+      if (!response.ok) {
+        const error = new Error("Postcode lookup failed") as Error & { status?: number };
+        error.status = response.status;
+        throw error;
+      }
+      const payload = await response.json() as PostcodePayload;
+      if (!Number.isFinite(payload.lat) || !Number.isFinite(payload.lng)) {
+        throw new Error("Invalid postcode result");
+      }
+      return payload;
+    };
+
+    try {
+      let payload: PostcodePayload;
+      try {
+        payload = await lookup();
+      } catch (error) {
+        const status = (error as Error & { status?: number }).status;
+        if (status !== 502) throw error;
+        await new Promise((resolve) => window.setTimeout(resolve, 250));
+        payload = await lookup();
+      }
+
+      const appliedPostcode = payload.postcode || postcode;
+      setDestinationPoint({ lat: payload.lat, lng: payload.lng });
+      setFilters((current) => ({ ...current, destinationPostcode: appliedPostcode }));
+      setPostcodeDraft(appliedPostcode);
+      setSelectedId(null);
+    } catch {
+      // Keep the edited postcode in place so the user can retry or correct it.
+    } finally {
+      controller.abort();
+      setPostcodeUpdating(false);
+    }
   };
 
   useEffect(() => {
@@ -93,58 +153,6 @@ export default function Home() {
 
     return () => { cancelled = true; };
   }, []);
-
-  useEffect(() => {
-    const postcode = filters.destinationPostcode.trim();
-    if (!postcode) return;
-
-    const controller = new AbortController();
-    const timer = window.setTimeout(async () => {
-      const lookup = async () => {
-        const response = await fetch(`/api/postcode?postcode=${encodeURIComponent(postcode)}`, {
-          signal: controller.signal,
-          cache: "no-store",
-        });
-        if (!response.ok) {
-          const error = new Error("Postcode lookup failed") as Error & { status?: number };
-          error.status = response.status;
-          throw error;
-        }
-        const payload = await response.json() as { lat: number; lng: number };
-        if (!Number.isFinite(payload.lat) || !Number.isFinite(payload.lng)) {
-          throw new Error("Invalid postcode result");
-        }
-        return payload;
-      };
-
-      try {
-        let payload: { lat: number; lng: number };
-        try {
-          payload = await lookup();
-        } catch (error) {
-          if (controller.signal.aborted) return;
-          const status = (error as Error & { status?: number }).status;
-          if (status !== 502) throw error;
-          await new Promise((resolve) => window.setTimeout(resolve, 250));
-          if (controller.signal.aborted) return;
-          payload = await lookup();
-        }
-
-        if (controller.signal.aborted) return;
-        setDestinationPoint({ lat: payload.lat, lng: payload.lng });
-        setSelectedId(null);
-      } catch {
-        if (!controller.signal.aborted && postcode.replace(/\s+/g, "").toUpperCase() === "W1D3QW") {
-          setDestinationPoint(DEFAULT_WORK_POINT);
-        }
-      }
-    }, 250);
-
-    return () => {
-      window.clearTimeout(timer);
-      controller.abort();
-    };
-  }, [filters.destinationPostcode]);
 
   const effectiveAreas = useMemo(
     () => areas.map((area) => ({
@@ -194,6 +202,11 @@ export default function Home() {
       <FilterBar
         filters={filters}
         onChange={setFilters}
+        postcodeValue={postcodeDraft}
+        onPostcodeChange={setPostcodeDraft}
+        onPostcodeApply={handlePostcodeApply}
+        postcodeDirty={postcodeDirty}
+        postcodeUpdating={postcodeUpdating}
         londonCrimeAverage={londonCrimeAverage}
       />
 
