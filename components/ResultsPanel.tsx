@@ -198,6 +198,11 @@ function AreaCard({
   const crime = area.crime;
   const boundary = area.boundaryName && area.boundaryName !== area.name ? ` · ${area.boundaryName} ward` : "";
   const visibleTags = area.profile.tags.filter((tag) => !tag.trim().toLowerCase().startsWith("private renting"));
+  const rentDetail = result.rent === null
+    ? "ONS borough rent by bedroom"
+    : area.rentSource === "centralLondonProxy"
+      ? "/ month · Central London proxy"
+      : `/ month · ${area.borough}`;
 
   return (
     <button
@@ -227,7 +232,7 @@ function AreaCard({
           label="Rent"
           passes={result.rentMatches}
           value={money(result.rent)}
-          detail={result.rent === null ? "ONS borough rent by bedroom" : `/ month · ${area.borough}`}
+          detail={rentDetail}
         />
         <Metric
           label="Reported crime"
