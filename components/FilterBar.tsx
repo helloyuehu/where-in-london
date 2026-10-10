@@ -6,12 +6,26 @@ import type { BedroomOption, FilterState, TravelMode } from "@/lib/types";
 type Props = {
   filters: FilterState;
   onChange: (next: FilterState) => void;
+  postcodeValue: string;
+  onPostcodeChange: (value: string) => void;
+  onPostcodeApply: () => void;
+  postcodeDirty: boolean;
+  postcodeUpdating: boolean;
   londonCrimeAverage: number | null;
 };
 
 const bedroomOptions: BedroomOption[] = [1, 2, 3, "4+"];
 
-export function FilterBar({ filters, onChange, londonCrimeAverage }: Props) {
+export function FilterBar({
+  filters,
+  onChange,
+  postcodeValue,
+  onPostcodeChange,
+  onPostcodeApply,
+  postcodeDirty,
+  postcodeUpdating,
+  londonCrimeAverage,
+}: Props) {
   const [mobileExpanded, setMobileExpanded] = useState(false);
 
   const update = <K extends keyof FilterState>(key: K, value: FilterState[K]) => {
@@ -33,7 +47,7 @@ export function FilterBar({ filters, onChange, londonCrimeAverage }: Props) {
       >
         <span className="filterMobileTitle">Filters</span>
         <span className="filterMobileSummary">
-          {filters.destinationPostcode || "Postcode"} · £{filters.rentMin.toLocaleString()}–£{filters.rentMax.toLocaleString()} · {filters.bedroom} bed
+          {postcodeValue || "Postcode"} · £{filters.rentMin.toLocaleString()}–£{filters.rentMax.toLocaleString()} · {filters.bedroom} bed
         </span>
         <span className="filterMobileChevron" aria-hidden="true">{mobileExpanded ? "▲" : "▼"}</span>
       </button>
@@ -52,9 +66,27 @@ export function FilterBar({ filters, onChange, londonCrimeAverage }: Props) {
       >
         <div className="filterGroup destinationGroup" style={{ flex: "1 1 150px", minWidth: 140 }}>
           <label htmlFor="postcode">Work postcode</label>
-          <div className="inlineInput">
+          <div className={`inlineInput${postcodeDirty ? " hasPostcodeAction" : ""}`}>
             <span className="pinDot" aria-hidden="true" />
-            <input id="postcode" value={filters.destinationPostcode} onChange={(event) => update("destinationPostcode", event.target.value.toUpperCase())} placeholder="W1D 3QW" />
+            <input
+              id="postcode"
+              value={postcodeValue}
+              onChange={(event) => onPostcodeChange(event.target.value.toUpperCase())}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" && postcodeDirty && !postcodeUpdating) onPostcodeApply();
+              }}
+              placeholder="W1D 3QW"
+            />
+            {postcodeDirty && (
+              <button
+                type="button"
+                className="postcodeUpdateButton"
+                onClick={onPostcodeApply}
+                disabled={postcodeUpdating || !postcodeValue.trim()}
+              >
+                {postcodeUpdating ? "Updating" : "Update"}
+              </button>
+            )}
           </div>
         </div>
 
@@ -141,6 +173,28 @@ export function FilterBar({ filters, onChange, londonCrimeAverage }: Props) {
         .filterShell .filterBar {
           border-bottom: 0;
           overflow-y: visible;
+        }
+        .inlineInput.hasPostcodeAction input {
+          padding-right: 76px;
+        }
+        .postcodeUpdateButton {
+          position: absolute;
+          right: 4px;
+          top: 4px;
+          height: 30px;
+          min-width: 62px;
+          padding: 0 9px;
+          border: 0;
+          border-radius: 7px;
+          background: #181818;
+          color: #fff;
+          font-size: 10px;
+          font-weight: 700;
+          cursor: pointer;
+        }
+        .postcodeUpdateButton:disabled {
+          opacity: .55;
+          cursor: default;
         }
         .filterMobileToggle {
           display: none;
