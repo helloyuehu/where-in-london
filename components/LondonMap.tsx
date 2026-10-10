@@ -387,18 +387,26 @@ export function LondonMap({ results, selectedId, onSelect, destinationPostcode }
   }, []);
 
   useEffect(() => {
-    const map = mapRef.current;
-    const wards = wardsRef.current;
-    if (!map || !wards || !map.isStyleLoaded()) return;
-    const wardSource = map.getSource("london-wards") as GeoJSONSource | undefined;
-    const labelSource = map.getSource("result-labels") as GeoJSONSource | undefined;
-    wardSource?.setData(decorateWards(wards, results));
-    labelSource?.setData(makeResultLabels(results));
-  }, [resultSignature, results]);
+    const frame = window.requestAnimationFrame(() => {
+      const map = mapRef.current;
+      const wards = wardsRef.current;
+      if (!map || !wards) return;
+
+      const wardSource = map.getSource("london-wards") as GeoJSONSource | undefined;
+      const labelSource = map.getSource("result-labels") as GeoJSONSource | undefined;
+      if (!wardSource || !labelSource) return;
+
+      const latestResults = resultsRef.current;
+      wardSource.setData(decorateWards(wards, latestResults));
+      labelSource.setData(makeResultLabels(latestResults));
+    });
+
+    return () => window.cancelAnimationFrame(frame);
+  }, [resultSignature]);
 
   useEffect(() => {
     const map = mapRef.current;
-    if (!map || !map.isStyleLoaded() || !map.getLayer("selected-ward-line")) return;
+    if (!map || !map.getLayer("selected-ward-line")) return;
     map.setFilter("selected-ward-line", ["==", ["get", "id"], selectedId || "__none__"]);
     if (!selectedId) return;
     const selected = results.find((result) => result.area.id === selectedId);
