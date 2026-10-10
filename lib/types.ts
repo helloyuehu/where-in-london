@@ -41,6 +41,7 @@ export type LondonArea = {
     radiusMiles: number;
   } | null;
   rentByBedroom: Record<string, number> | null;
+  rentSource?: "borough" | "centralLondonProxy";
   profile: {
     summary: string;
     tags: string[];
