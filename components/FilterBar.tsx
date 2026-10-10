@@ -84,6 +84,10 @@ export function FilterBar({
                 onClick={onPostcodeApply}
                 disabled={postcodeUpdating || !postcodeValue.trim()}
               >
+                <svg className="postcodeUpdateIcon" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                  <path d="M13.25 4.75V1.75m0 3h-3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                  <path d="M13.02 4.15A5.75 5.75 0 1 0 13.5 9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                </svg>
                 {postcodeUpdating ? "Updating" : "Update"}
               </button>
             )}
@@ -175,14 +179,14 @@ export function FilterBar({
           overflow-y: visible;
         }
         .inlineInput.hasPostcodeAction input {
-          padding-right: 76px;
+          padding-right: 88px;
         }
         .postcodeUpdateButton {
           position: absolute;
           right: 4px;
           top: 4px;
           height: 30px;
-          min-width: 62px;
+          min-width: 74px;
           padding: 0 9px;
           border: 0;
           border-radius: 7px;
@@ -191,6 +195,15 @@ export function FilterBar({
           font-size: 10px;
           font-weight: 700;
           cursor: pointer;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          gap: 5px;
+        }
+        .postcodeUpdateIcon {
+          width: 12px;
+          height: 12px;
+          flex: 0 0 auto;
         }
         .postcodeUpdateButton:disabled {
           opacity: .55;
