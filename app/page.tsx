@@ -100,22 +100,45 @@ export default function Home() {
 
     const controller = new AbortController();
     const timer = window.setTimeout(async () => {
-      try {
+      const lookup = async () => {
         const response = await fetch(`/api/postcode?postcode=${encodeURIComponent(postcode)}`, {
           signal: controller.signal,
           cache: "no-store",
         });
-        if (!response.ok) throw new Error("Postcode lookup failed");
-        const payload = await response.json() as { lat: number; lng: number };
-        if (Number.isFinite(payload.lat) && Number.isFinite(payload.lng)) {
-          setDestinationPoint({ lat: payload.lat, lng: payload.lng });
+        if (!response.ok) {
+          const error = new Error("Postcode lookup failed") as Error & { status?: number };
+          error.status = response.status;
+          throw error;
         }
+        const payload = await response.json() as { lat: number; lng: number };
+        if (!Number.isFinite(payload.lat) || !Number.isFinite(payload.lng)) {
+          throw new Error("Invalid postcode result");
+        }
+        return payload;
+      };
+
+      try {
+        let payload: { lat: number; lng: number };
+        try {
+          payload = await lookup();
+        } catch (error) {
+          if (controller.signal.aborted) return;
+          const status = (error as Error & { status?: number }).status;
+          if (status !== 502) throw error;
+          await new Promise((resolve) => window.setTimeout(resolve, 250));
+          if (controller.signal.aborted) return;
+          payload = await lookup();
+        }
+
+        if (controller.signal.aborted) return;
+        setDestinationPoint({ lat: payload.lat, lng: payload.lng });
+        setSelectedId(null);
       } catch {
         if (!controller.signal.aborted && postcode.replace(/\s+/g, "").toUpperCase() === "W1D3QW") {
           setDestinationPoint(DEFAULT_WORK_POINT);
         }
       }
-    }, 350);
+    }, 250);
 
     return () => {
       window.clearTimeout(timer);
