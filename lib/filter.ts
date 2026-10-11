@@ -1,12 +1,22 @@
 import type { BedroomOption, Criterion, FilterState, LondonArea, MatchResult, TravelMode } from "@/lib/types";
 
+const BARBICAN_RENT_ESTIMATE: Record<string, number> = {
+  "1": 2108,
+  "2": 2646,
+  "3": 3047,
+  "4+": 4047,
+};
+
 function bedroomKey(value: BedroomOption): string {
   return String(value);
 }
 
 export function getRent(area: LondonArea, bedroom: BedroomOption): number | null {
-  if (!area.rentByBedroom) return null;
-  return area.rentByBedroom[bedroomKey(bedroom)] ?? null;
+  const key = bedroomKey(bedroom);
+  if (!area.rentByBedroom) {
+    return area.id === "E05009288" ? BARBICAN_RENT_ESTIMATE[key] ?? null : null;
+  }
+  return area.rentByBedroom[key] ?? null;
 }
 
 function modeWithinLimit(area: LondonArea, mode: TravelMode, max: number): boolean | null {
