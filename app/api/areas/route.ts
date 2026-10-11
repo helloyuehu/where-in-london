@@ -5,15 +5,6 @@ import type { Feature, FeatureCollection, Geometry, MultiPolygon, Polygon, Posit
 
 const GLA_WARDS = "https://gis.london.gov.uk/arcgis/rest/services/apps/webmap_context_layer/MapServer/9/query?where=1%3D1&outFields=ward_code%2Cward_name%2Cla_name%2Cla_gss_code&returnGeometry=true&outSR=4326&f=geojson";
 const TARGET_AREA_COUNT = 80;
-const CENTRAL_LONDON_PROXY_BOROUGHS = [
-  "Camden",
-  "Islington",
-  "Tower Hamlets",
-  "Southwark",
-  "Westminster",
-  "Hackney",
-];
-const BEDROOM_KEYS = ["1", "2", "3", "4+"] as const;
 
 export const revalidate = 86400;
 
@@ -75,8 +66,6 @@ type WardRow = {
   point: { lat: number; lng: number };
   displayName: string;
 };
-
-type RentByBorough = Record<string, Record<string, number>>;
 
 function normalise(value: unknown) {
   return String(value || "")
@@ -147,20 +136,6 @@ async function readJson<T>(filePath: string, fallback: T): Promise<T> {
   } catch {
     return fallback;
   }
-}
-
-function buildCentralLondonRentProxy(rentsByBorough: RentByBorough) {
-  const proxy: Record<string, number> = {};
-
-  for (const bedroom of BEDROOM_KEYS) {
-    const values = CENTRAL_LONDON_PROXY_BOROUGHS
-      .map((borough) => rentsByBorough[borough]?.[bedroom])
-      .filter((value): value is number => Number.isFinite(value) && value > 0);
-    if (!values.length) return null;
-    proxy[bedroom] = Math.round(values.reduce((sum, value) => sum + value, 0) / values.length);
-  }
-
-  return proxy;
 }
 
 function selectRepresentativeAreas(features: Feature<Geometry>[], priorities: AreaPriority[]): WardRow[] {
@@ -257,12 +232,11 @@ function sourceList(ward: GeneratedWard | undefined, censusProfile: CensusProfil
 
 export async function GET() {
   try {
-    const [wardsResponse, generated, censusProfiles, priorities, rentsByBorough] = await Promise.all([
+    const [wardsResponse, generated, censusProfiles, priorities] = await Promise.all([
       fetch(GLA_WARDS, { next: { revalidate } }),
       readJson<GeneratedPayload>("lib/data/ward-metrics.generated.json", { wards: [] }),
       readJson<CensusProfilePayload>("data/ward-profiles.generated.json", { profiles: {} }),
       readJson<AreaPriority[]>("data/area-priorities.json", []),
-      readJson<RentByBorough>("data/ons-rents-by-borough.json", {}),
     ]);
     if (!wardsResponse.ok) throw new Error("Official GLA ward request failed");
 
@@ -273,8 +247,6 @@ export async function GET() {
       const code = ward.wardCode || ward.id;
       if (code) generatedByCode.set(code, ward);
     }
-
-    const centralLondonRentProxy = buildCentralLondonRentProxy(rentsByBorough);
 
     let selectedRows: WardRow[];
     if (generatedByCode.size >= 40) {
@@ -311,15 +283,7 @@ export async function GET() {
         walking: metrics?.commute?.walking ?? null,
       };
       const crime = metrics?.crime ?? null;
-      const useCentralLondonProxy = !metrics?.rentByBedroom
-        && normalise(row.borough) === normalise("City of London")
-        && Boolean(centralLondonRentProxy);
-      const rentByBedroom = metrics?.rentByBedroom ?? (useCentralLondonProxy ? centralLondonRentProxy : null);
-      const rentSource = metrics?.rentByBedroom
-        ? "borough"
-        : useCentralLondonProxy
-          ? "centralLondonProxy"
-          : undefined;
+      const rentByBedroom = metrics?.rentByBedroom ?? null;
       const profile = censusProfile?.summary
         ? { summary: censusProfile.summary, tags: censusProfile.tags || [] }
         : metrics?.profile?.summary
@@ -330,13 +294,6 @@ export async function GET() {
             };
       const factsReady = Boolean(crime && rentByBedroom);
       const anyFacts = Boolean(crime || rentByBedroom || commute.publicTransport || commute.walking);
-      const sources = sourceList(metrics, censusProfile);
-      if (useCentralLondonProxy) {
-        sources.push({
-          label: "rent",
-          detail: "ONS private rents · Central London proxy average",
-        });
-      }
 
       return {
         id: row.code,
@@ -348,9 +305,8 @@ export async function GET() {
         commute,
         crime,
         rentByBedroom,
-        rentSource,
         profile,
-        sources,
+        sources: sourceList(metrics, censusProfile),
         dataStatus: factsReady ? "ready" : anyFacts ? "partial" : "pending",
       };
     });
